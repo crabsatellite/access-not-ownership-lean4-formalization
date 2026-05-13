@@ -293,7 +293,7 @@ theorem single_lever_bound
                  sp.Lambda - 1 := by
     have h : sp.Lambda - 1 < a.omega *
               (sp.delta + (sp.beta + sp.gamma) * sp.w_p) :=
-      (div_lt_iff hDenom).mp hOmega
+      (div_lt_iff₀ hDenom).mp hOmega
     have hComm : a.omega *
                  (sp.delta + (sp.beta + sp.gamma) * sp.w_p)
                = (sp.delta + (sp.beta + sp.gamma) * sp.w_p) *
