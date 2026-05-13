@@ -59,7 +59,8 @@
       lemma_independence_gap, welfare_gap_at_reference,
       long_run_step1_profit_zero,
       long_run_step4_zero_lobbying,
-      long_run_step5_policy_invariance,
+      long_run_step5_mStar_invariance,
+      long_run_step5_bmuStar_invariance,
       eta_attenuation_at_zero,
       eta_attenuation_unit_interval
 

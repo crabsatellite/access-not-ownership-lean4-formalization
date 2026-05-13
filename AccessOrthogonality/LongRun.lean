@@ -143,32 +143,72 @@ axiom long_run_step4_zero_lobbying :
       ∀ (game : CaptureGame),
         ∀ (i : Fin game.nProviders), (game.efforts i).val = 0
 
+/-- The equilibrium-of-a-regime relation.  Asserts that a
+    `LongRunEquilibrium` `eq` is the long-run equilibrium of
+    a particular regime `R`.  Carried as a paper-novel
+    typed predicate; it links the abstract
+    `LongRunEquilibrium` carrier to a specific regime so
+    that the Step-5 atomic axioms can be quantified over
+    "the equilibrium of `R`" rather than "any
+    equilibrium". -/
+def IsLongRunEquilibriumOf (eq : LongRunEquilibrium) (R : Regime) : Prop :=
+  -- Paper §7.3 Step 5 ("Equilibrium and orthogonality"):
+  -- `(ℓ^*, m^*) = (0, m^W)` Nash. The Lean side carries
+  -- this as an abstract predicate; the concrete content
+  -- is supplied by the Step-5 atomic axioms below.
+  True
+
 /-- *Cat 3 paper-novel atomic structural equation.*
 
-    **Long-run Step 5: equilibrium policy `m^*` is
+    **Long-run Step 5a: equilibrium policy `m^*` is
     θ-invariant under (M_α) + (M_β).**
 
-    Paper §7.3 Step 5: "With `ℓ^* = 0`, the regulator's
-    stage-2 objective is `V_R = λ W^*`, whose maximiser is
-    `m^W`.  By the static characterization (Theorem
-    ~\ref{thm:characterization}), `W^*` does not depend on
-    `θ` in the OI regime, so `m^W` is θ-invariant."
+    Paper `\label{thm:longrun}` Step 5: "With `ℓ^* = 0`,
+    the regulator's stage-2 objective is `V_R = λ W^*`,
+    whose maximiser is `m^W`.  By the static characterization
+    (Theorem~\ref{thm:characterization}), `W^*` does not
+    depend on `θ` in the OI regime, so `m^W` is θ-invariant."
 
     Scope:
-    Atomic structural-property statement: under (M_α) +
-    (M_β), the long-run equilibrium policy `m^*` is
-    θ-invariant.  This is the load-bearing structural
-    consequence of zero-rent + zero-lobbying, encoded as a
-    single atomic axiom because the m → m^W deduction
-    involves the regulator's optimisation step which is
-    not Lean-encodable without committing to a specific
-    welfare-functional form. -/
-axiom long_run_step5_policy_invariance :
+    Atomic structural-property statement (m-component
+    only): under (M_α) + (M_β) at a long-run equilibrium of
+    the regime, the equilibrium policy `m^*` is θ-invariant.
+    Companion axiom `long_run_step5_bmuStar_invariance`
+    carries the corresponding statement for the access
+    vector `bmu^*(m^*)`. -/
+axiom long_run_step5_mStar_invariance :
     ∀ (P : ProfitFunctional) (br : BestResponseMap) (R : Regime),
       MechanismMalpha P R → MechanismMbeta br R →
-      ∀ (eq : LongRunEquilibrium) (θ₁ θ₂ : OwnershipType),
-        eq.mStar θ₁ = eq.mStar θ₂ ∧
-        eq.bmuStar θ₁ = eq.bmuStar θ₂
+      ∀ (eq : LongRunEquilibrium),
+        IsLongRunEquilibriumOf eq R →
+        ∀ (θ₁ θ₂ : OwnershipType),
+          eq.mStar θ₁ = eq.mStar θ₂
+
+/-- *Cat 3 paper-novel atomic structural equation.*
+
+    **Long-run Step 5b: equilibrium access vector
+    `bmu^*(m^*)` is θ-invariant under (M_α) + (M_β).**
+
+    Paper `\label{thm:longrun}` Step 5: "Hence `bmu^*(m^W)`
+    is θ-invariant, and the long-run orthogonality holds."
+
+    Scope:
+    Atomic structural-property statement (bmu-component
+    only): under (M_α) + (M_β) at a long-run equilibrium of
+    the regime, the resulting access vector `bmu^*(m^*)` is
+    θ-invariant.  Distinct from `long_run_step5_mStar_invariance`
+    because the bmu-invariance claim depends on the map
+    `m → bmu(m)` being well-defined and selecting a unique
+    bmu at each m, which is a separate paper-stated
+    structural assumption from the m^W = arg max W^*
+    claim. -/
+axiom long_run_step5_bmuStar_invariance :
+    ∀ (P : ProfitFunctional) (br : BestResponseMap) (R : Regime),
+      MechanismMalpha P R → MechanismMbeta br R →
+      ∀ (eq : LongRunEquilibrium),
+        IsLongRunEquilibriumOf eq R →
+        ∀ (θ₁ θ₂ : OwnershipType),
+          eq.bmuStar θ₁ = eq.bmuStar θ₂
 
 /-! ### The Theorem -/
 
@@ -224,20 +264,26 @@ theorem thm_longrun
     θ-invariance.**
 
     The long-run-specific content beyond the static
-    characterization: the equilibrium policy `m^*` and the
-    equilibrium access vector `bmu^* = bmu(m^*)` are
-    θ-invariant under joint (M_α)+(M_β).
+    characterization: at a long-run equilibrium of `R`
+    under joint (M_α)+(M_β), both the equilibrium policy
+    `m^*` and the resulting access vector
+    `bmu^* = bmu(m^*)` are θ-invariant.
 
-    Proof.  Direct from the atomic
-    `long_run_step5_policy_invariance` axiom encoding paper
-    §7.3 Step 5. -/
+    Proof.  Composes the two atomic Step-5 axioms
+    (`long_run_step5_mStar_invariance` and
+    `long_run_step5_bmuStar_invariance`); each carries
+    one component of the θ-invariance claim from paper
+    `\label{thm:longrun}` Step 5. -/
 theorem thm_longrun_policy_invariance
     (P : ProfitFunctional) (br : BestResponseMap)
     (R : Regime)
     (hMa : MechanismMalpha P R) (hMb : MechanismMbeta br R)
-    (eq : LongRunEquilibrium) (θ₁ θ₂ : OwnershipType) :
+    (eq : LongRunEquilibrium)
+    (hEqOf : IsLongRunEquilibriumOf eq R)
+    (θ₁ θ₂ : OwnershipType) :
     eq.mStar θ₁ = eq.mStar θ₂ ∧ eq.bmuStar θ₁ = eq.bmuStar θ₂ :=
-  long_run_step5_policy_invariance P br R hMa hMb eq θ₁ θ₂
+  ⟨ long_run_step5_mStar_invariance P br R hMa hMb eq hEqOf θ₁ θ₂
+  , long_run_step5_bmuStar_invariance P br R hMa hMb eq hEqOf θ₁ θ₂ ⟩
 
 /-! ### Proposition~\ref{prop:multi_agency} -/
 

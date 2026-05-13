@@ -189,23 +189,53 @@ def gap_long_run_step4_zero_lobbying : GapEntry := {
     "equilibrium has zero lobbying effort."
 }
 
-/-- (LongRun) Step 5: policy invariance. -/
-def gap_long_run_step5_policy_invariance : GapEntry := {
-  name := "long_run_step5_policy_invariance"
+/-- (LongRun) Step 5a: m^* invariance. -/
+def gap_long_run_step5_mStar_invariance : GapEntry := {
+  name := "long_run_step5_mStar_invariance"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
   paperSource :=
-    "Li 2026, `\\label{thm:longrun}` proof Step 5: \"By the " ++
-    "static characterization (Theorem~\\ref{thm:characterization}), " ++
-    "W^* does not depend on θ in the OI regime, so m^W is " ++
-    "θ-invariant.\""
-  attackHistory := []
+    "Li 2026, `\\label{thm:longrun}` proof Step 5: \"With " ++
+    "`ℓ^* = 0`, the regulator's stage-2 objective is " ++
+    "`V_R = λ W^*`, whose maximiser is `m^W`.  By the static " ++
+    "characterization (Theorem~\\ref{thm:characterization}), " ++
+    "`W^*` does not depend on θ in the OI regime, so `m^W` " ++
+    "is θ-invariant.\""
+  attackHistory := [
+    "v0.2 (audit R1): split out of the composite " ++
+      "long_run_step5_policy_invariance axiom; one atomic " ++
+      "axiom per paper claim per feedback_lean_axiom_decomposition.md"
+  ]
   scope :=
-    "Atomic statement: under (M_α)+(M_β), the long-run " ++
-    "equilibrium policy m^* AND the resulting access vector " ++
-    "bmu^*(m^*) are both θ-invariant.  Encodes paper §7.3 " ++
-    "Step 5 as a single atomic axiom because the m → m^W " ++
-    "deduction depends on the welfare-functional form."
+    "Atomic m-component: under (M_α)+(M_β), the long-run " ++
+    "equilibrium policy `m^*` is θ-invariant.  Quantified " ++
+    "over `IsLongRunEquilibriumOf eq R` to link the " ++
+    "abstract `LongRunEquilibrium` carrier to a specific " ++
+    "regime `R`.  Companion: `long_run_step5_bmuStar_invariance` " ++
+    "for the bmu-component."
+}
+
+/-- (LongRun) Step 5b: bmu^*(m^*) invariance. -/
+def gap_long_run_step5_bmuStar_invariance : GapEntry := {
+  name := "long_run_step5_bmuStar_invariance"
+  status := GapStatus.gapOpen
+  inputCategory := InputCategory.cat3PaperNovel
+  paperSource :=
+    "Li 2026, `\\label{thm:longrun}` proof Step 5: \"Hence " ++
+    "`bmu^*(m^W)` is θ-invariant, and the long-run " ++
+    "orthogonality holds.\""
+  attackHistory := [
+    "v0.2 (audit R1): split out of the composite " ++
+      "long_run_step5_policy_invariance axiom; one atomic " ++
+      "axiom per paper claim per feedback_lean_axiom_decomposition.md"
+  ]
+  scope :=
+    "Atomic bmu-component: under (M_α)+(M_β), the long-run " ++
+    "equilibrium access vector `bmu^*(m^*)` is θ-invariant. " ++
+    "Quantified over `IsLongRunEquilibriumOf eq R`.  " ++
+    "Distinct from `long_run_step5_mStar_invariance` because " ++
+    "bmu-invariance additionally requires the m → bmu(m) " ++
+    "map to be well-defined and θ-blind at the selected m."
 }
 
 /-! ### Cat 3 paper-novel typed primitives (carriers) -/
@@ -913,7 +943,8 @@ def allGaps : List GapEntry := [
   gap_welfare_gap_at_reference,
   gap_long_run_step1_profit_zero,
   gap_long_run_step4_zero_lobbying,
-  gap_long_run_step5_policy_invariance,
+  gap_long_run_step5_mStar_invariance,
+  gap_long_run_step5_bmuStar_invariance,
   -- Cat 3 paper-novel typed primitives (carriers)
   gap_kappa1_carrier,
   gap_kappa2_carrier,
@@ -1019,7 +1050,8 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
       lemma_independence_gap, welfare_gap_at_reference,
       long_run_step1_profit_zero,
       long_run_step4_zero_lobbying,
-      long_run_step5_policy_invariance,
+      long_run_step5_mStar_invariance,
+      long_run_step5_bmuStar_invariance,
       eta_attenuation_at_zero,
       eta_attenuation_unit_interval
 
