@@ -105,32 +105,44 @@ axiom welfareFactorsThroughAllocation
       ∀ (θ : OwnershipType) (a : AccessVector) (R : Regime),
         W.W θ a R = wOfAlloc (br.alloc θ R) a R
 
-/-- *Cat 2 external textbook atomic axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
-    **Best-response coincidence on isocline at unique
-    cost-minimum.**
+    **Necessity bridge: welfare-θ-invariance ⇒ best-response
+    θ-invariance.**
 
-    Refined atomic form of MWG Prop 5.C.2 applied to the
-    Cobb-Douglas isocline of the quality dynamics in
-    paper eq. (eq:quality_dynamics): if two ownership-types
-    yield best-responses on the same isocline, they must
-    coincide (by uniqueness of the cost-minimum at strictly
-    positive input prices `r_c = 1, w_d > 0`).
+    Paper `\label{thm:characterization}` (⇒ Necessity) Case 2:
+    "Suppose the two allocations lie on the same isocline...
+    the cost-minimising point on the isocline is unique
+    given input prices `r_c` and `w_d`...if both allocations
+    are firm-optima they must be cost-equivalent.  But the
+    unique cost-minimum on a given isocline is a single
+    point.  Hence the two allocations cannot both be optima
+    for distinct θ_i."
 
-    Citation: Mas-Colell, Whinston, Green, *Microeconomic
-    Theory*, Oxford University Press 1995, Proposition 5.C.2
-    (unique cost-minimising input bundle on convex isoquant
-    at strictly positive input prices).
+    Citation discipline.  This is Cat 3 (paper-novel) — it
+    is Li's specific application of MWG Prop 5.C.2(v)
+    (cost-min uniqueness on strictly-convex isoquants;
+    external textbook fact) to the Cobb-Douglas isocline of
+    the quality dynamics `\eqref{eq:quality_dynamics}`,
+    plus paper §4.3 Case 1 + Case 2 case-split + the
+    contradiction argument.  The textbook ingredient
+    (MWG Prop 5.C.2(v)) is opaque-carrier-bound but does
+    NOT directly yield the implication on the welfare
+    functional — Case 2 of the paper proof is a non-trivial
+    composition that is paper-novel.
 
     Scope:
     Carrier of the (⇒) Necessity direction in paper
-    Theorem~\ref{thm:characterization}.  Stated as an
-    implication on the welfare functional: if the welfare
-    is θ-invariant then so is the allocation (the
-    contrapositive of Case 2 of the paper proof).  This is
-    the *substantive* content of necessity beyond the
-    "welfare factors through allocation" reformulation
-    encoded in `welfareFactorsThroughAllocation`. -/
+    Theorem `\label{thm:characterization}`.  Encodes the
+    full Case 2 necessity argument as a single atomic
+    bridge.  The substantive content lives in the case-split
+    plus the application of MWG Prop 5.C.2(v) to the
+    Cobb-Douglas isocline.  Further decomposition (Case 1
+    + Case 2 as separate atomics, with MWG Prop 5.C.2(v)
+    as a separate Cat 2 atomic feeding into Case 2) is a
+    desideratum but would require building the isocline /
+    welfare-via-quality apparatus that is currently
+    abstracted into `WelfareFunctional`. -/
 axiom bestResponseUniqueAtThetaInvariantWelfare
     (W : WelfareFunctional) (br : BestResponseMap)
     (a : AccessVector) (R : Regime) :

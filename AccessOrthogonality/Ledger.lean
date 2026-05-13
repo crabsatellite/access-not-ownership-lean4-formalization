@@ -341,22 +341,38 @@ def gap_eta_attenuation_unit_interval : GapEntry := {
 
 /-! ### Cat 2 atomic external textbook axioms -/
 
-/-- (Characterization) Cobb-Douglas isocline cost-min uniqueness. -/
+/-- (Characterization) Necessity bridge via Case 1+Case 2. -/
 def gap_bestResponseUniqueAtThetaInvariantWelfare : GapEntry := {
   name := "bestResponseUniqueAtThetaInvariantWelfare"
   status := GapStatus.gapOpen
-  inputCategory := InputCategory.cat2External
+  inputCategory := InputCategory.cat3PaperNovel
   paperSource :=
-    "Mas-Colell, Whinston, Green, *Microeconomic Theory*, " ++
-    "Oxford University Press 1995, Proposition 5.C.2 " ++
-    "(unique cost-minimising input bundle on convex isoquant " ++
-    "at strictly positive input prices)."
-  attackHistory := []
+    "Li 2026, `\\label{thm:characterization}` Necessity " ++
+    "direction Case 1+Case 2: paper-novel application of " ++
+    "MWG (1995) Prop 5.C.2(v) (cost-min uniqueness on " ++
+    "strictly-convex isoquants — Cat 2 textbook fact) to " ++
+    "the Cobb-Douglas isocline of the quality dynamics " ++
+    "`\\eqref{eq:quality_dynamics}`, combined with the " ++
+    "Case 1 (different isoclines) vs. Case 2 (same " ++
+    "isocline) case-split + cost-equivalence contradiction."
+  attackHistory := [
+    "v0.2 (audit R7): re-categorised Cat 2 → Cat 3.  " ++
+      "Textbook ingredient (MWG Prop 5.C.2(v)) is " ++
+      "opaque-carrier-bound but does not directly yield " ++
+      "the implication on the welfare functional.  Case 1 " ++
+      "+ Case 2 case-split + cost-equivalence contradiction " ++
+      "is paper-novel.  Future decomposition: extract " ++
+      "MWG Prop 5.C.2(v) as a separate Cat 2 atomic + " ++
+      "Case 2 contradiction as a separate Cat 3 atomic; " ++
+      "requires building isocline/welfare-via-quality " ++
+      "apparatus currently abstracted into " ++
+      "`WelfareFunctional`."
+  ]
   scope :=
     "Necessity direction of Theorem~\\ref{thm:characterization}: " ++
     "if welfare is θ-invariant, then the best-response is " ++
-    "θ-invariant.  Cobb-Douglas-isocline cost-min-uniqueness " ++
-    "step from paper §4.3 Case 2."
+    "θ-invariant.  Encodes the full Case 1+Case 2 argument " ++
+    "as a single atomic bridge."
 }
 
 /-- (Gini) κ_1 positivity for η < 1. -/
@@ -1129,7 +1145,7 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
   them).  The axiom names by category:
 
     Cat 2 propositional (external published textbook):
-      bestResponseUniqueAtThetaInvariantWelfare,
+      welfareFactorsThroughAllocation,
       kappa1_pos, kappa2_pos, sK_nonneg,
       shorrocks_additive_decomposition_atomic,
       lerman_yitzhaki_comonotonicity_translation,
@@ -1139,7 +1155,7 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
       kappa1, kappa2, sK, eta_attenuation, mBertrand
 
     Cat 3 propositional structural equations (paper-stated):
-      welfareFactorsThroughAllocation,
+      bestResponseUniqueAtThetaInvariantWelfare,
       SC1_implements_Malpha, SC3_implements_Mbeta,
       lemma_independence_gap, welfare_gap_at_reference,
       lemma_lizzeri_bundled_rent,

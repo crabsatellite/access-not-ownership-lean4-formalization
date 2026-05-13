@@ -41,14 +41,16 @@
 
     Cat 2 propositional axioms (Mas-Colell-Whinston-Green +
     Acemoglu-Restrepo + Shorrocks + Lerman-Yitzhaki + Tirole):
-      bestResponseUniqueAtThetaInvariantWelfare,
+      welfareFactorsThroughAllocation,
       kappa1_pos, kappa2_pos, sK_nonneg,
       shorrocks_additive_decomposition_atomic,
       lerman_yitzhaki_comonotonicity_translation,
       mBertrand_nonneg, mBertrand_monotone
 
     Cat 3 propositional structural equations (Li 2026):
-      welfareFactorsThroughAllocation,
+      bestResponseUniqueAtThetaInvariantWelfare
+        (Case 1+Case 2 necessity bridge — MWG Prop 5.C.2(v)
+        applied to Cobb-Douglas isocline),
       SC1_implements_Malpha, SC3_implements_Mbeta,
       lemma_independence_gap, welfare_gap_at_reference,
       lemma_lizzeri_bundled_rent (integrated-seller-certifier

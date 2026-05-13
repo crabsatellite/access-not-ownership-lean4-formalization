@@ -301,29 +301,68 @@ structure ProfitFunctional where
   Pi : Investment → OwnershipType → Regime → ℝ
 
 /-- *Rent-zero margin* `(M_α)` (Proposition
-    `\label{prop:four_mechanisms}`): the access-layer profit
-    margin is identically zero on every investment, irrespective
-    of `θ`. -/
+    `\label{prop:four_mechanisms}` clause (M_α)).
+
+    Paper §3.3 form: `∇_{(c_i,d_i)} Π_i = 0` (marginal-rent
+    sense; profit gradient on the access-rent margin is
+    zero).  Long-run Step 1 strengthens this to uniform-rent
+    sense `Π_i^*(m) = 0` (paper Step 1: "Hence provider
+    profit `Π_i^*(m) = ... = 0` uniformly in `m`").
+
+    Lean encoding choice (audit R6 honesty).  We encode the
+    *uniform-rent* form `P.Pi x θ R = 0` for all `(x, θ)`,
+    matching the long-run Step 1 strengthening.  This is
+    stronger than the static-only Prop `\label{prop:four_mechanisms}`
+    clause (M_α) marginal form.  The static-only marginal
+    form is `prop_four_mechanisms_Mbeta` via the
+    operational consequence path used in `thm_separation`. -/
 def MechanismMalpha (P : ProfitFunctional) (R : Regime) : Prop :=
   ∀ (x : Investment) (θ : OwnershipType), P.Pi x θ R = 0
 
 /-- *Exogenous choice* `(M_β)` (Proposition
-    `\label{prop:four_mechanisms}`): the regulator's financing
-    mechanism pins `(c, d)` regardless of `θ`. -/
+    `\label{prop:four_mechanisms}` clause (M_β)).
+
+    Paper §3.3: the regulator's financing mechanism pins
+    `(c_i, d_i)` regardless of `θ_i`.  Lean encoding is the
+    direct operational form `∃ x, ∀ θ, alloc θ R = x`. -/
 def MechanismMbeta (br : BestResponseMap) (R : Regime) : Prop :=
   ∃ x : Investment, ∀ θ : OwnershipType, br.alloc θ R = x
 
 /-- *Gradient alignment* `(M_γ)` (Proposition
-    `\label{prop:four_mechanisms}`): at the equilibrium,
-    `∇Π_i = ∇W` on the investment variables.  Stated abstractly
-    via "best-response is θ-independent under the convex
-    combination", which is the operational consequence. -/
+    `\label{prop:four_mechanisms}` clause (M_γ)).
+
+    Paper §3.3: at the equilibrium, `∇_{(c_i,d_i)} Π_i =
+    ∇_{(c_i,d_i)} W` on the investment variables.  Lean
+    encoding is the OPERATIONAL CONSEQUENCE form: "the
+    convex-combination objective `(1-θ)Π + θW` has
+    θ-invariant best-response", which by paper FOC analysis
+    follows from `∇Π = ∇W`.
+
+    Honest scope note (audit R6).  The Lean type of (M_γ)
+    coincides with (M_β) — both say `∃ x, ∀ θ, alloc θ R =
+    x`.  The paper-level distinction is in the MECHANISM
+    that produces the operational form: (M_β) by mechanism
+    (regulator pins choice), (M_γ) by FOC (gradients align,
+    so the convex-combination's optimum is θ-invariant).
+    Lean cannot distinguish the mechanisms at the
+    propositional level without a richer carrier; the
+    Lean-level coincidence is honest about this. -/
 def MechanismMgamma (br : BestResponseMap) (R : Regime) : Prop :=
   ∃ x : Investment, ∀ θ : OwnershipType, br.alloc θ R = x
 
 /-- *Constraint-set invariance* `(M_δ)` (Proposition
-    `\label{prop:four_mechanisms}`): the binding constraint
-    pins `(c, d)` regardless of `θ`. -/
+    `\label{prop:four_mechanisms}` clause (M_δ)).
+
+    Paper §3.3: the firm's feasible action set is restricted
+    by an external constraint that binds for all
+    `θ_i ∈ [0,1]` at the same allocation (e.g., hardware-
+    export controls, data-residency rules, capacity caps).
+
+    Honest scope note (audit R6).  As with (M_γ), the Lean
+    type coincides with (M_β).  Paper-level distinction is
+    in the MECHANISM (external constraint set, not regulator
+    financing), which Lean cannot carry without a richer
+    representation of "feasibility set". -/
 def MechanismMdelta (br : BestResponseMap) (R : Regime) : Prop :=
   ∃ x : Investment, ∀ θ : OwnershipType, br.alloc θ R = x
 
