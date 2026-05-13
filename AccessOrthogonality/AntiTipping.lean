@@ -91,8 +91,25 @@ axiom eta_attenuation : ℝ → ℝ
     **`η(ν) ∈ [0,1]`.**
 
     Paper Appendix A.3 Step 3 boundary behaviour: `η(0) = 0`
-    and `η → 1` asymptotically, with `η_max = 1 - c_R / (K_max m)`.
-    The values stay in the unit interval by construction. -/
+    and `η → 1` asymptotically, with
+    `η_max = 1 - c_R / (K_max · m_{bundled,ν})`.  The values
+    stay in the unit interval by construction on the
+    operative range `ν ≥ 2/K_max` of Remark
+    `\label{rem:below_threshold}`.
+
+    Honest scope (audit R9).  The Lean axiom claims
+    `0 ≤ η(ν) ≤ 1` for ALL `ν : ℝ`, which is slightly
+    stronger than what the paper directly supports: for
+    `ν < 2/K_max` (below-threshold regime), `K(ν) ∈ {0, 1}`
+    and the Bertrand argument does not apply (paper Remark
+    `\label{rem:below_threshold}`).  Below threshold the
+    rent floor remains at the bundled value `m_bundled` and
+    the bound `0 ≤ η ≤ 1` is a paper-stated normalisation
+    choice on the operative range, extended to all `ν` for
+    Lean-encoding tractability.  This is honest about
+    encoding `0 ≤ η(ν) ≤ 1` as paper-stated discipline on
+    the operative range, not as a derived consequence of
+    the η(ν) formula. -/
 axiom eta_attenuation_unit_interval :
     ∀ (ν : ℝ), 0 ≤ eta_attenuation ν ∧ eta_attenuation ν ≤ 1
 
