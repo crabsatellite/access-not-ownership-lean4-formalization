@@ -1,0 +1,15 @@
+name = "AccessOrthogonality"
+version = "0.1.0"
+keywords = ["industrial-organization", "ai-governance", "welfare-economics", "verification-binding", "regulatory-capture"]
+defaultTargets = ["AccessOrthogonality", "AccessOrthogonality.Ledger"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+
+[[lean_lib]]
+name = "AccessOrthogonality"
