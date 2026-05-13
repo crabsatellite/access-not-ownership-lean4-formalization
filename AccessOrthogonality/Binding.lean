@@ -97,16 +97,24 @@ structure WelfareAccessFunctional where
       Political Economy* 89(4), 1981, pp. 615–641
       (reputation-aggregation framework).
 
-    Scope:
-    Atomic structural statement: for any credence-good
-    `WelfareAccessFunctional` `W_cred`, the welfare at fixed
-    `ν` does not depend on `(ω, π)` through the per-output
-    gap on credence goods.  Stated abstractly as the
-    `(ω, π)`-invariance of the welfare DIFFERENCE
-    `W_cred(ω, π, ν) - W_cred(ω, π, 0)`. -/
+    Scope (audit R8 — domain restriction):
+    Atomic structural statement on the paper-stated domain
+    `(ω, π) ∈ [0,1]^2`, `ν ∈ [0,1]`: for any credence-good
+    `WelfareAccessFunctional` `W_cred`, the welfare
+    DIFFERENCE `W_cred(ω, π, ν) - W_cred(ω, π, 0)` is
+    `(ω, π)`-invariant on the credence-good portion of the
+    output space.  Paper Remark
+    `\label{rem:partition_endogeneity}` honestly notes that
+    "credence-good portion" depends on which queries
+    institutionally lack public benchmarks; the Lemma is
+    conditional on the credence-good complement of the
+    experience-good portion. -/
 axiom lemma_independence_gap :
     ∀ (W : WelfareAccessFunctional) (ν : ℝ),
+      0 ≤ ν → ν ≤ 1 →
       ∀ (ω₁ π₁ ω₂ π₂ : ℝ),
+        0 ≤ ω₁ → ω₁ ≤ 1 → 0 ≤ π₁ → π₁ ≤ 1 →
+        0 ≤ ω₂ → ω₂ ≤ 1 → 0 ≤ π₂ → π₂ ≤ 1 →
         W.Wcred ω₁ π₁ ν - W.Wcred ω₁ π₁ 0 =
         W.Wcred ω₂ π₂ ν - W.Wcred ω₂ π₂ 0
 
@@ -243,32 +251,33 @@ axiom mBertrand_one_le_bundled :
     **Welfare-gap at `(ω, π) = (0, 0)` is linear in `ν`
     with rent-differential coefficient.**
 
-    Paper §6.4 (proof of Theorem~\ref{thm:t4_binding}):
+    Paper proof of Theorem `\label{thm:t4_binding}`:
     "Setting `c` equal to the consumer's information-demand
-    differential per unit of `ν` yields (eq:verification_binding).
-    The bound is independent of `(ω, π)` because the Lizzeri
-    rent characterization in Lemma~\ref{lem:lizzeri} is
+    differential per unit of `ν` yields
+    `\eqref{eq:verification_binding}`.  The bound is
+    independent of `(ω, π)` because the Lizzeri rent
+    characterization in Lemma `\label{lem:lizzeri}` is
     independent of the production-side parameters."
 
     Citation: Li 2026, `\label{thm:t4_binding}` proof —
     setting `c` as the consumer's information-demand
-    differential per unit of `ν`, which by Lizzeri 1999
-    Proposition 1 is `m_bundled - m_Bertrand(1)` at the
-    unbundled saturation limit.
+    differential per unit of `ν`, equal to
+    `m_bundled - m_Bertrand(1)` at the unbundled saturation
+    limit by the integrated-rent extension of Lizzeri 1999.
 
-    Scope:
-    Atomic statement that the welfare-gap-from-rent-
-    differential is positive at the reference point `(0, 0)`
-    in `(ω, π)`: given the bundled rent `m_bundled > 0` and
-    the Bertrand-bound `m_Bertrand(1) ≤ m_bundled`, there
-    exists `c > 0` such that `W^*(0, 0, ν) - W^*(0, 0, 0) ≥
-    c · ν`. -/
+    Scope (audit R8 — domain restriction).  Atomic statement
+    that there exists `c > 0` such that
+    `c · ν ≤ W^*(0, 0, ν) - W^*(0, 0, 0)` on the
+    paper-stated domain `ν ∈ [0, 1]`.  The paper does NOT
+    claim the bound for `ν < 0` or `ν > 1`; the domain
+    restriction is honest about what the paper asserts. -/
 axiom welfare_gap_at_reference :
     ∀ (W : WelfareAccessFunctional) (m_bundled : ℝ),
       0 < m_bundled →
       mBertrand 1 ≤ m_bundled →
       ∃ c : ℝ, 0 < c ∧
-        ∀ (ν : ℝ), c * ν ≤ W.Wcred 0 0 ν - W.Wcred 0 0 0
+        ∀ (ν : ℝ), 0 ≤ ν → ν ≤ 1 →
+          c * ν ≤ W.Wcred 0 0 ν - W.Wcred 0 0 0
 
 /-- **Theorem~\ref{thm:t4_binding} (Verification-Binding).**
 
@@ -305,6 +314,8 @@ theorem thm_t4_binding
     (W : WelfareAccessFunctional) :
     ∃ c : ℝ, 0 < c ∧
       ∀ (ω π ν : ℝ),
+        0 ≤ ω → ω ≤ 1 → 0 ≤ π → π ≤ 1 →
+        0 ≤ ν → ν ≤ 1 →
         c * ν ≤ W.Wcred ω π ν - W.Wcred ω π 0 := by
   -- Step 1: extract bundled rent from Lemma~\ref{lem:lizzeri}.
   obtain ⟨m_bundled, hM_pos⟩ := lemma_lizzeri_bundled_rent
@@ -315,13 +326,17 @@ theorem thm_t4_binding
   obtain ⟨c, hc_pos, hRefBd⟩ :=
     welfare_gap_at_reference W m_bundled hM_pos hBertLe
   refine ⟨c, hc_pos, ?_⟩
-  intro ω π ν
+  intro ω π ν hOmegaLo hOmegaHi hPiLo hPiHi hNuLo hNuHi
   -- Step 4: lift to arbitrary `(ω, π)` via Lemma~\ref{lem:independence}.
   have hInv : W.Wcred ω π ν - W.Wcred ω π 0 =
               W.Wcred 0 0 ν - W.Wcred 0 0 0 :=
-    lemma_independence_gap W ν ω π 0 0
+    lemma_independence_gap W ν hNuLo hNuHi
+      ω π 0 0
+      hOmegaLo hOmegaHi hPiLo hPiHi
+      (le_refl 0) (by norm_num : (0:ℝ) ≤ 1)
+      (le_refl 0) (by norm_num : (0:ℝ) ≤ 1)
   rw [hInv]
-  exact hRefBd ν
+  exact hRefBd ν hNuLo hNuHi
 
 /-- **Theorem~\ref{thm:t4_binding}, boundary case
     `(ω, π) = (1, 1)`.**
@@ -338,23 +353,33 @@ theorem thm_t4_binding_at_boundary
     (W : WelfareAccessFunctional) :
     ∃ c : ℝ, 0 < c ∧
       ∀ (ν : ℝ),
+        0 ≤ ν → ν ≤ 1 →
         c * ν ≤ W.Wcred 1 1 ν - W.Wcred 1 1 0 := by
   obtain ⟨c, hc_pos, hc_bd⟩ := thm_t4_binding W
-  exact ⟨c, hc_pos, fun ν => hc_bd 1 1 ν⟩
+  refine ⟨c, hc_pos, ?_⟩
+  intro ν hNuLo hNuHi
+  exact hc_bd 1 1 ν (by norm_num) (le_refl 1) (by norm_num)
+    (le_refl 1) hNuLo hNuHi
 
 /-- **Lemma~\ref{lem:independence} (Credence-good gap
     independence).**
 
     Direct restatement of the atomic axiom
-    `lemma_independence_gap`: the welfare difference
-    `W_cred(ω, π, ν) - W_cred(ω, π, 0)` is independent of
-    `(ω, π)`. -/
+    `lemma_independence_gap` on the paper-stated domain
+    `(ω, π) ∈ [0,1]^2`, `ν ∈ [0,1]`. -/
 theorem lem_independence
     (W : WelfareAccessFunctional) (ν : ℝ)
-    (ω₁ π₁ ω₂ π₂ : ℝ) :
+    (hNuLo : 0 ≤ ν) (hNuHi : ν ≤ 1)
+    (ω₁ π₁ ω₂ π₂ : ℝ)
+    (hOmega1Lo : 0 ≤ ω₁) (hOmega1Hi : ω₁ ≤ 1)
+    (hPi1Lo : 0 ≤ π₁) (hPi1Hi : π₁ ≤ 1)
+    (hOmega2Lo : 0 ≤ ω₂) (hOmega2Hi : ω₂ ≤ 1)
+    (hPi2Lo : 0 ≤ π₂) (hPi2Hi : π₂ ≤ 1) :
     W.Wcred ω₁ π₁ ν - W.Wcred ω₁ π₁ 0 =
     W.Wcred ω₂ π₂ ν - W.Wcred ω₂ π₂ 0 :=
-  lemma_independence_gap W ν ω₁ π₁ ω₂ π₂
+  lemma_independence_gap W ν hNuLo hNuHi ω₁ π₁ ω₂ π₂
+    hOmega1Lo hOmega1Hi hPi1Lo hPi1Hi
+    hOmega2Lo hOmega2Hi hPi2Lo hPi2Hi
 
 /-- **Lemma~\ref{lem:lizzeri} (Integrated seller-certifier
     rent; extension of Lizzeri 1999).**
