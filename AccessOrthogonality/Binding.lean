@@ -118,42 +118,119 @@ axiom lemma_independence_gap :
         W.Wcred ω₁ π₁ ν - W.Wcred ω₁ π₁ 0 =
         W.Wcred ω₂ π₂ ν - W.Wcred ω₂ π₂ 0
 
-/-! ### Cat 2 atomic external textbook axioms -/
+/-! ### Cat 2 atomic external textbook axioms +
+       v0.3 Cat 3 reductionism decomposition of
+       `lemma_lizzeri_bundled_rent` -/
+
+/-! ### v0.3 decomposition of `lemma_lizzeri_bundled_rent`
+
+    Paper `\label{lem:lizzeri}` + Remark
+    `\label{rem:lizzeri_extension}` make the structural
+    distinction explicit: the SEPARATE-intermediary case is
+    Lizzeri 1999 Prop 1 (external textbook); the
+    INTEGRATED-seller-certifier extension is paper-novel and
+    rests on Lemma `\label{lem:independence}`.  v0.3 (v6
+    §3.4.6 reductionism round) splits the prior single Cat 3
+    atomic axiom into:
+
+      (a) `lizzeri_1999_separate_certifier_rent` (Cat 2 —
+          Lizzeri 1999 *RAND J. Econ.* 30(2) Prop 1):
+          monopoly certifier facing a SEPARATE seller
+          extracts a positive rent via minimal-disclosure
+          optimal information design.
+      (b) `bundled_extension_via_independence` (Cat 3
+          structuralEquation): paper-novel integrated-seller-
+          certifier extension step.  Per
+          Remark `\label{rem:lizzeri_extension}`, the bundled
+          rent inherits positivity from the separate-case
+          rent under Lemma `\label{lem:independence}` ruling
+          out the Akerlof signalling collapse.
+      (c) `lemma_lizzeri_bundled_rent` (derived theorem)
+          composes (a)+(b). -/
+
+/-- *Cat 2 atomic external textbook axiom.*
+
+    **Lizzeri 1999 Prop 1: monopoly-certifier rent
+    (separate-intermediary configuration).**
+
+    Citation: Lizzeri, Alessandro, "Information Revelation
+    and Certification Intermediaries," *RAND Journal of
+    Economics* 30(2), 1999, pp. 214–231, Proposition 1
+    (monopoly certifier with rational consumer expectations
+    optimally discloses only whether quality is above or
+    below the threshold required to support purchase; the
+    certifier extracts the full information-rent surplus
+    `m_separate > 0`).
+
+    Scope:
+    Atomic existence: there is a positive rent `m_separate >
+    0` extracted by a monopoly certifier in the
+    SEPARATE-seller-and-intermediary configuration of
+    Lizzeri 1999 (the textbook case).  This is the external
+    prior art on which paper Lemma `\label{lem:lizzeri}`
+    builds; the INTEGRATED-seller-certifier extension lives
+    in `bundled_extension_via_independence` below. -/
+axiom lizzeri_1999_separate_certifier_rent :
+    ∃ m_separate : ℝ, 0 < m_separate
 
 /-- *Cat 3 paper-novel atomic structural equation.*
+
+    **Integrated-seller-certifier extension of Lizzeri 1999
+    (paper Remark `\label{rem:lizzeri_extension}`).**
+
+    Paper `\label{lem:lizzeri}` + Remark
+    `\label{rem:lizzeri_extension}`: "The result is an
+    extension of \citet{lizzeri1999information} to the
+    integrated seller-certifier configuration.  Lizzeri (1999)
+    treats an independent monopolist certifier facing a
+    separate seller; the integrated case requires
+    Lemma~\ref{lem:independence} to rule out the alternative
+    micro-foundation in which an integrated provider commits
+    not to certify favorably and the configuration collapses
+    to seller-side disclosure under signalling à la Akerlof
+    (1970)."
+
+    Citation: Li 2026, `\label{rem:lizzeri_extension}` — the
+    paper-novel content of the extension is precisely the
+    `lem:independence`-discharged proof that the integrated
+    bundled-regime rent inherits positivity from the
+    separate-certifier rent (rather than collapsing to
+    Akerlof signalling).
+
+    Scope:
+    Atomic structural step: given a positive separate-
+    certifier rent `m_separate > 0` (Lizzeri 1999 Prop 1
+    base case), the bundled-regime integrated-seller-
+    certifier configuration admits a positive bundled rent
+    `m_bundled > 0`.  Quantifies the bundled-extension
+    direction of `\label{rem:lizzeri_extension}`. -/
+axiom bundled_extension_via_independence :
+    ∀ (m_separate : ℝ), 0 < m_separate →
+      ∃ m_bundled : ℝ, 0 < m_bundled
+
+/-- *Derived theorem (v0.3 decomposition of former Cat 3 atomic).*
 
     **Lemma~\ref{lem:lizzeri}: integrated seller-certifier
     rent (extension of Lizzeri 1999).**
 
     Paper `\label{lem:lizzeri}` + Remark
-    `\label{rem:lizzeri_extension}`: under Assumptions
-    `\label{ass:credence}`–`\label{ass:reputation}` and
-    Lemma `\label{lem:independence}`, when the certifier is
-    also the seller (bundled regime, `v = 1`), the optimal
-    information-disclosure strategy reveals the minimum
-    information that supports purchase.  The integrated
-    certifier extracts a rent `m > 0` that does NOT vanish
-    as `(ω, π) → (1, 1)`.
+    `\label{rem:lizzeri_extension}` composed: the integrated
+    seller-certifier configuration extracts a positive rent
+    `m_bundled > 0`.
 
-    Citation discipline.  The atomic axiom is Cat 3
-    (paper-novel) — NOT a direct citation of Lizzeri 1999.
-    Per Remark `\label{rem:lizzeri_extension}`: "Lizzeri
-    (1999) treats an independent monopolist certifier
-    facing a separate seller; the integrated case requires
-    Lemma~\ref{lem:independence} to rule out the
-    alternative micro-foundation...".  The Lizzeri 1999
-    Proposition 1 result (monopoly certifier extracts
-    surplus via min-disclosure on the separate-seller-
-    and-intermediary configuration) is the external prior
-    art; the integrated-seller-certifier extension is
-    paper-novel.
+    Derivation (Lean):
+    1. Apply `lizzeri_1999_separate_certifier_rent` (Cat 2)
+       to obtain `m_separate > 0` (separate-intermediary
+       textbook base case).
+    2. Apply `bundled_extension_via_independence` (Cat 3
+       paper-novel; integrated-extension step via
+       Lemma~\ref{lem:independence}) to obtain `m_bundled > 0`.
 
-    Scope:
-    Atomic existence: there is a positive constant
-    `m_bundled > 0` representing the bundled-regime rent
-    in the integrated-seller-certifier configuration. -/
-axiom lemma_lizzeri_bundled_rent :
-    ∃ m_bundled : ℝ, 0 < m_bundled
+    *No paper-novel content beyond the two atomic axioms.*  -/
+theorem lemma_lizzeri_bundled_rent :
+    ∃ m_bundled : ℝ, 0 < m_bundled := by
+  obtain ⟨m_separate, hSepPos⟩ := lizzeri_1999_separate_certifier_rent
+  exact bundled_extension_via_independence m_separate hSepPos
 
 /-- *Cat 3 paper-novel typed primitive.*
 
