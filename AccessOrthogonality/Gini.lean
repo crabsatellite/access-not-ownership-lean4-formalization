@@ -376,31 +376,35 @@ theorem thm_gini_theta_invariance
 
 /-! ### Corollary~\ref{cor:gini} — Lerman-Yitzhaki translation -/
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
     **Lerman-Yitzhaki comonotonicity translation.**
 
-    Paper Corollary~\ref{cor:gini} + Appendix A.2 "Translation
-    to Gini": under the income-rank correlation condition of
-    Lerman-Yitzhaki 1985 (capital-rent and verification-rent
-    components are co-ranked with total income),
+    Paper Corollary `\label{cor:gini}` + Appendix A.2
+    "Translation to Gini": under the income-rank correlation
+    condition of Lerman-Yitzhaki 1985 (capital-rent and
+    verification-rent components are co-ranked with total
+    income),
 
         G^* ≤ baseGini + κ_1 s_K (1-μ) + κ_2 (1-ν)
 
     with the same `(κ_1, κ_2)` to first order in factor shares.
 
-    Citation: Lerman, Robert I., and Shlomo Yitzhaki, "Income
-    Inequality Effects by Income Source: A New Approach and
-    Applications to the United States," *Review of Economics
-    and Statistics* 67(1), 1985, pp. 151–156 (exact
-    decomposition `G = Σ s_k G_k R_k` with `R_k` = Gini
-    rank-correlation; comonotonicity = all `R_k = 1`).
+    Citation discipline.  This is Cat 3 (paper-novel) — it
+    is Li's composition of Lerman-Yitzhaki 1985 *RESt*
+    Gini-decomposition formula `G = Σ s_k G_k R_k` (Cat 2
+    textbook fact) with the GE_0-bound form of `thm_gini`.
+    The transcription "Gini bound takes the same form as
+    GE_0 bound to first order in factor shares" is a
+    paper-novel claim that requires first-order
+    factor-share linearisation; the underlying
+    Lerman-Yitzhaki theorem supplies the exact `R_k = 1`
+    decomposition but does not directly yield the bound
+    coefficient match.
 
     Scope:
-    Atomic statement that the Gini bound takes the same form
-    as the `GE_0` bound under comonotonicity.  Treated as a
-    composite-free atomic citation since it is a single
-    theorem-numbered result. -/
+    Atomic translation step from the GE_0 bound form to
+    the Gini bound form under comonotonicity. -/
 axiom lerman_yitzhaki_comonotonicity_translation :
     ∀ (I : InequalityFunctional)
       (θ : OwnershipType) (a : AccessVector) (R : Regime),

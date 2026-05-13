@@ -40,11 +40,10 @@
   AccessOrthogonality/Ledger.lean`):
 
     Cat 2 propositional axioms (Mas-Colell-Whinston-Green +
-    Acemoglu-Restrepo + Shorrocks + Lerman-Yitzhaki + Tirole):
+    Acemoglu-Restrepo + Shorrocks + Tirole):
       welfareFactorsThroughAllocation,
       kappa1_pos, kappa2_pos, sK_nonneg,
       shorrocks_additive_decomposition_atomic,
-      lerman_yitzhaki_comonotonicity_translation,
       mBertrand_nonneg, mBertrand_monotone
 
     Cat 3 propositional structural equations (Li 2026):
@@ -63,6 +62,9 @@
         (Lizzeri-extension × Bertrand × κ_2 composition),
       gini_two_channel_partition (paper-novel HA-7 channel
         exhaustion claim),
+      lerman_yitzhaki_comonotonicity_translation
+        (Lerman-Yitzhaki 1985 × GE_0-bound × first-order
+        factor-share linearisation composition),
       long_run_step1_profit_zero,
       long_run_step4_zero_lobbying,
       long_run_step5_mStar_invariance,

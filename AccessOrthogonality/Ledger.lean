@@ -522,19 +522,25 @@ def gap_gini_two_channel_partition : GapEntry := {
 def gap_lerman_yitzhaki_comonotonicity_translation : GapEntry := {
   name := "lerman_yitzhaki_comonotonicity_translation"
   status := GapStatus.gapOpen
-  inputCategory := InputCategory.cat2External
+  inputCategory := InputCategory.cat3PaperNovel
   paperSource :=
-    "Lerman, Robert I., and Shlomo Yitzhaki, \"Income " ++
-    "Inequality Effects by Income Source: A New Approach " ++
-    "and Applications to the United States,\" *Review of " ++
-    "Economics and Statistics* 67(1), 1985, pp. 151–156 " ++
-    "(exact decomposition G = Σ s_k G_k R_k with R_k = " ++
-    "Gini rank-correlation; comonotonicity = all R_k = 1)."
-  attackHistory := []
+    "Li 2026, `\\label{cor:gini}` + Appendix A.2 " ++
+    "Translation-to-Gini composition: Li's composition of " ++
+    "Lerman-Yitzhaki (1985) *RESt* 67(1):151-156 Gini " ++
+    "decomposition formula `G = Σ s_k G_k R_k` (Cat 2 " ++
+    "textbook ingredient) with the GE_0-bound form of " ++
+    "`thm_gini`, plus first-order factor-share " ++
+    "linearisation to match coefficients."
+  attackHistory := [
+    "v0.2 (audit R3+R7): re-categorised Cat 2 → Cat 3.  " ++
+      "Lerman-Yitzhaki 1985 supplies the Gini decomposition " ++
+      "theorem; the transcription from GE_0 bound to Gini " ++
+      "bound with coefficient match to first order is " ++
+      "paper-novel composition."
+  ]
   scope :=
     "Under comonotonicity, the Gini bound takes the same " ++
-    "form as the GE_0 bound to first order in factor shares. " ++
-    "Single-theorem atomic citation."
+    "form as the GE_0 bound to first order in factor shares."
 }
 
 /-- (Binding) Lemma~\ref{lem:lizzeri} — bundled rent existence. -/
@@ -1148,7 +1154,6 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
       welfareFactorsThroughAllocation,
       kappa1_pos, kappa2_pos, sK_nonneg,
       shorrocks_additive_decomposition_atomic,
-      lerman_yitzhaki_comonotonicity_translation,
       mBertrand_nonneg, mBertrand_monotone
 
     Cat 3 carrier axioms (Li 2026):
@@ -1163,6 +1168,7 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
       capital_share_channel_contribution,
       verification_rent_channel_contribution,
       gini_two_channel_partition,
+      lerman_yitzhaki_comonotonicity_translation,
       long_run_step1_profit_zero,
       long_run_step4_zero_lobbying,
       long_run_step5_mStar_invariance,
