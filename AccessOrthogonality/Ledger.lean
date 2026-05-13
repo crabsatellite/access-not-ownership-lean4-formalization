@@ -3,13 +3,21 @@
 
   Gap ledger.  Every atomic axiom, every Cat 3 carrier, every
   blocked route, and every closed top-level result is
-  recorded as a typed `GapEntry` with TWO orthogonal
-  classifications:
+  recorded as a typed `GapEntry` with three orthogonal
+  classifications plus a broken-link dependency list:
 
-    * 5-tier status:    gapOpen / gapPartial / gapBlocked /
-                        gapDeadEnd / gapClosed
-    * 3-input-category: cat1Mathlib / cat2External /
+    * 6-tier status:    gapOpen / gapPartial / gapBlocked /
+                        gapDeadEnd / gapClosed /
+                        gapClosedConditional
+    * 4-input-category: cat1Mathlib / cat2External /
                         cat3PaperNovel / notInput
+    * Cat 3 sub-type:   carrier / hypothesisPredicate /
+                        structuralEquation / workingAssumption /
+                        conditionalHypothesis / notCat3
+    * conditionalOn :   list of `Hyp_*` broken-link predicate
+                        names (non-empty iff status is
+                        `gapClosedConditional`; see
+                        `feedback_gap_ledger_in_lean4` v6 §12)
 
   Pre-attack discipline.  Scan this ledger before launching
   new attacks.  Re-attempting a `gapBlocked` or `gapDeadEnd`
@@ -17,37 +25,78 @@
 
   `attackHistory` is the canonical location for round
   metadata (citation revisions, atomic refactors, prior
-  retractions); docstrings and scope fields are kept to
-  current-state content only.
+  retractions, Cat 3 reductionism check outcomes); docstrings
+  and scope fields are kept to current-state content only.
 -/
 
 import AccessOrthogonality
 
 namespace AccessOrthogonality.Ledger
 
-/-- 5-tier status tag attached to each gap. -/
+/-- 6-tier status tag attached to each gap.  `gapClosedConditional`
+    is used when Phase 4 catches a defect breaking a typed-bridge
+    chain: the downstream closure is preserved as conditional on a
+    named `Hyp_*` broken-link hypothesis (recorded in the entry's
+    `conditionalOn` field) pending repair or independent derivation.
+    See `feedback_gap_ledger_in_lean4` v6 §12. -/
 inductive GapStatus
   | gapOpen
   | gapPartial
   | gapBlocked
   | gapDeadEnd
   | gapClosed
+  | gapClosedConditional
   deriving DecidableEq, Repr
 
-/-- 3-input-category tag attached to each gap.  Orthogonal to
-    status. -/
+/-- 4-input-category tag attached to each gap.  Orthogonal to status.
+    (Cat 0 = Lean kernel axioms — `propext` / `Classical.choice` /
+    `Quot.sound` — is the always-present system layer and is not
+    tracked here per v6 §3.1.) -/
 inductive InputCategory
-  /-- Mathlib-derivable theorem (no axiom). -/
+  /-- Mathlib-derivable theorem (no axiom).  Project has zero such. -/
   | cat1Mathlib
   /-- External published; opaque-carrier-bound axiom +
       citation. -/
   | cat2External
-  /-- Paper-novel: carrier or paper-stated atomic defining
-      equation. -/
+  /-- Paper-novel: carrier, hypothesis predicate, structural defining
+      equation, working assumption, or conditional hypothesis.
+      Refine via the `cat3SubType` field. -/
   | cat3PaperNovel
-  /-- Not an atomic input: derived theorem (gapClosed) or
-      blocked Mathlib-derivation route (gapBlocked). -/
+  /-- Not an atomic input: derived theorem (gapClosed) or genuine
+      no-acceptance-possible route (gapBlocked / gapDeadEnd). -/
   | notInput
+  deriving DecidableEq, Repr
+
+/-- Cat 3 paper-novel sub-types per v6 §3.4.  Orthogonal to status
+    and input-category; only meaningful when
+    `inputCategory = cat3PaperNovel`. -/
+inductive Cat3SubType
+  /-- Paper-introduced primitive type or typed-primitive value
+      (e.g., paper-introduced functions / constants such as κ_1,
+      κ_2, s_K, η, m_Bertrand).  Definitional atom; 永不 close. -/
+  | carrier
+  /-- Paper-introduced scope/regime predicate (e.g.,
+      `IsLongRunEquilibriumOf`, `StructurallyDecoupled`).
+      Definitional atom; 永不 close. -/
+  | hypothesisPredicate
+  /-- Paper-stated definitional equation on its primitives
+      (e.g., paper Theorem-stated structural equation such as
+      `eta_attenuation 0 = 0`, `long_run_step1_profit_zero`,
+      `gini_two_channel_partition`).  Definitional atom; 永不
+      close — these constitute the paper's commitments to how its
+      primitives behave. -/
+  | structuralEquation
+  /-- Higher-level claim temporarily axiomatized while derivation is
+      developed.  必须 close before paper submission. -/
+  | workingAssumption
+  /-- Paper's conclusion conditional on an external open problem
+      (RH, BSD, Hodge, P≠NP).  永不 close; encoded as theorem-
+      signature antecedent `theorem T (hRH : RiemannHypothesis) : ...`,
+      NOT as an axiom.  Listed here only for completeness; project
+      has none. -/
+  | conditionalHypothesis
+  /-- This entry is not Cat 3 paper-novel. -/
+  | notCat3
   deriving DecidableEq, Repr
 
 /-- Typed record for a single gap. -/
@@ -55,24 +104,34 @@ structure GapEntry where
   /-- Identifier matching the underlying axiom / theorem
       name. -/
   name : String
-  /-- 5-tier status (orthogonal to inputCategory). -/
+  /-- 6-tier status. -/
   status : GapStatus
   /-- Input category (orthogonal to status). -/
   inputCategory : InputCategory
+  /-- Cat 3 sub-type (orthogonal; `notCat3` unless
+      `inputCategory = cat3PaperNovel`). -/
+  cat3SubType : Cat3SubType
   /-- Operative paper / obstacle citation. -/
   paperSource : String
-  /-- Per-round attack trace. -/
+  /-- Per-round attack trace (canonical location for round
+      metadata).  For Cat 3 entries, MUST include ≥2 reductionism
+      check outcomes (Cat 1? Cat 2?) per v6 §5. -/
   attackHistory : List String
   /-- What content the entry carries; what it does NOT claim. -/
   scope : String
+  /-- Names of `Hyp_*` broken-link predicates this entry's proof
+      depends on.  Invariant: non-empty iff
+      `status = gapClosedConditional`.  See v6 §12. -/
+  conditionalOn : List String := []
 
-/-! ### Cat 3 paper-novel atomic structural equations -/
+/-! ### Cat 2 atomic external textbook welfare-economics axiom -/
 
 /-- (Characterization) Welfare factors through allocation. -/
 def gap_welfareFactorsThroughAllocation : GapEntry := {
   name := "welfareFactorsThroughAllocation"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Mas-Colell, Whinston, Green, *Microeconomic Theory*, " ++
     "Oxford University Press 1995, §10.D (partial-" ++
@@ -96,11 +155,15 @@ def gap_welfareFactorsThroughAllocation : GapEntry := {
     "allocation.  Does NOT assert specific functional form."
 }
 
+/-! ### Cat 3 paper-novel atomic structural equations
+       (sub-type: structuralEquation) -/
+
 /-- (Separation) SC1 implements M_α. -/
 def gap_SC1_implements_Malpha : GapEntry := {
   name := "SC1_implements_Malpha"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:separation}` proof: \"Under " ++
     "(SC1), marginal-cost access pricing zeros the access-" ++
@@ -117,6 +180,7 @@ def gap_SC3_implements_Mbeta : GapEntry := {
   name := "SC3_implements_Mbeta"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:separation}` proof: \"Under " ++
     "(SC3), the financing mechanism F is structured so that " ++
@@ -137,6 +201,7 @@ def gap_lemma_independence_gap : GapEntry := {
   name := "lemma_independence_gap"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{lem:independence}`: extending Darby-" ++
     "Karni (1973) credence-good framework + Klein-Leffler " ++
@@ -157,6 +222,7 @@ def gap_welfare_gap_at_reference : GapEntry := {
   name := "welfare_gap_at_reference"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:t4_binding}` proof: \"Setting c " ++
     "equal to the consumer's information-demand differential " ++
@@ -174,6 +240,7 @@ def gap_long_run_step1_profit_zero : GapEntry := {
   name := "long_run_step1_profit_zero"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:longrun}` proof Step 1: \"Under " ++
     "(M_α) [SC1] + (M_β) [SC3], provider profit Π_i^*(m) = " ++
@@ -189,6 +256,7 @@ def gap_long_run_step4_zero_lobbying : GapEntry := {
   name := "long_run_step4_zero_lobbying"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:longrun}` proof Step 4: \"The " ++
     "provider's stage-1 FOC ∂u_i/∂ℓ_i - ℓ_i = 0 gives ℓ_i^* " ++
@@ -204,6 +272,7 @@ def gap_long_run_step5_mStar_invariance : GapEntry := {
   name := "long_run_step5_mStar_invariance"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:longrun}` proof Step 5: \"With " ++
     "`ℓ^* = 0`, the regulator's stage-2 objective is " ++
@@ -230,6 +299,7 @@ def gap_long_run_step5_bmuStar_invariance : GapEntry := {
   name := "long_run_step5_bmuStar_invariance"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:longrun}` proof Step 5: \"Hence " ++
     "`bmu^*(m^W)` is θ-invariant, and the long-run " ++
@@ -248,13 +318,15 @@ def gap_long_run_step5_bmuStar_invariance : GapEntry := {
     "map to be well-defined and θ-blind at the selected m."
 }
 
-/-! ### Cat 3 paper-novel typed primitives (carriers) -/
+/-! ### Cat 3 paper-novel typed primitives
+       (sub-type: carrier) -/
 
 /-- κ_1(η) — capital-share coefficient. -/
 def gap_kappa1_carrier : GapEntry := {
   name := "kappa1"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{thm:gini}` Appendix A.2: κ_1(η) = " ++
     "(1-η) · s_K^{(0)} · s_L^{(0)} · χ where χ is " ++
@@ -271,6 +343,7 @@ def gap_kappa2_carrier : GapEntry := {
   name := "kappa2"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{thm:gini}` Appendix A.2: κ_2 > 0 " ++
     "proportional to share of consumer expenditure subject " ++
@@ -284,6 +357,7 @@ def gap_sK_carrier : GapEntry := {
   name := "sK"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{thm:gini}` Appendix A.2; primary " ++
     "reference: Acemoglu and Restrepo (2018, 2022) for " ++
@@ -299,6 +373,7 @@ def gap_eta_attenuation_carrier : GapEntry := {
   name := "eta_attenuation"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{thm:antitipping}` Appendix A.3 Step 3: " ++
     "η(ν) := 1 - c_R / (K(ν) · m_{bundled,ν}) where K(ν) = " ++
@@ -315,6 +390,7 @@ def gap_eta_attenuation_at_zero : GapEntry := {
   name := "eta_attenuation_at_zero"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:antitipping}` Appendix A.3 Step 3: " ++
     "\"η(0) = 0 (no attenuation in bundled regime).\""
@@ -329,6 +405,7 @@ def gap_eta_attenuation_unit_interval : GapEntry := {
   name := "eta_attenuation_unit_interval"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:antitipping}` Appendix A.3 Step 3: " ++
     "\"η_max = 1 - c_R / (K_max · m_{bundled,ν}); η → 1 as " ++
@@ -339,13 +416,16 @@ def gap_eta_attenuation_unit_interval : GapEntry := {
     "attenuation function."
 }
 
-/-! ### Cat 2 atomic external textbook axioms -/
+/-! ### Cat 2 atomic external textbook axioms + remaining
+       Cat 3 paper-novel structural equations
+       (mixed-citation section) -/
 
 /-- (Characterization) Necessity bridge via Case 1+Case 2. -/
 def gap_bestResponseUniqueAtThetaInvariantWelfare : GapEntry := {
   name := "bestResponseUniqueAtThetaInvariantWelfare"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:characterization}` Necessity " ++
     "direction Case 1+Case 2: paper-novel application of " ++
@@ -380,6 +460,7 @@ def gap_kappa1_pos : GapEntry := {
   name := "kappa1_pos"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Acemoglu and Restrepo, \"The Race Between Man and " ++
     "Machine,\" *American Economic Review* 108(6), 2018, " ++
@@ -396,6 +477,7 @@ def gap_kappa2_pos : GapEntry := {
   name := "kappa2_pos"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Lizzeri, Alessandro, \"Information Revelation and " ++
     "Certification Intermediaries,\" *RAND Journal of " ++
@@ -410,6 +492,7 @@ def gap_sK_nonneg : GapEntry := {
   name := "sK_nonneg"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Standard CES accounting; capital task share is a share " ++
     "of total income.  Acemoglu and Restrepo (2018, 2022) " ++
@@ -423,6 +506,7 @@ def gap_capital_share_channel_contribution : GapEntry := {
   name := "capital_share_channel_contribution"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:gini}` Appendix A.2 capital-share " ++
     "channel: composition of Acemoglu-Restrepo (2018) AER " ++
@@ -447,6 +531,7 @@ def gap_verification_rent_channel_contribution : GapEntry := {
   name := "verification_rent_channel_contribution"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:gini}` Appendix A.2 verification-" ++
     "rent channel: composition of Lemma `\\label{lem:lizzeri}` " ++
@@ -470,6 +555,7 @@ def gap_shorrocks_additive_decomposition_atomic : GapEntry := {
   name := "shorrocks_additive_decomposition_atomic"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Shorrocks, A. F., \"Inequality Decomposition by Factor " ++
     "Components,\" *Econometrica* 50(1), 1982, pp. 193–211 " ++
@@ -498,6 +584,7 @@ def gap_gini_two_channel_partition : GapEntry := {
   name := "gini_two_channel_partition"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:gini}` Appendix A.2 working " ++
     "assumption HA-7 (\"the capital-rent and verification-" ++
@@ -523,6 +610,7 @@ def gap_lerman_yitzhaki_comonotonicity_translation : GapEntry := {
   name := "lerman_yitzhaki_comonotonicity_translation"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{cor:gini}` + Appendix A.2 " ++
     "Translation-to-Gini composition: Li's composition of " ++
@@ -548,6 +636,7 @@ def gap_lemma_lizzeri_bundled_rent : GapEntry := {
   name := "lemma_lizzeri_bundled_rent"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{lem:lizzeri}` + Remark " ++
     "`\\label{rem:lizzeri_extension}`: integrated " ++
@@ -572,6 +661,7 @@ def gap_mBertrand_carrier : GapEntry := {
   name := "mBertrand"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{lem:bertrand}`: m_Bertrand(ν) := " ++
     "c_R / K(ν), the Bertrand-equilibrium rent function."
@@ -587,6 +677,7 @@ def gap_mBertrand_nonneg : GapEntry := {
   name := "mBertrand_nonneg"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Tirole, Jean, *The Theory of Industrial Organization*, " ++
     "MIT Press 1988, Chapter 5 (Bertrand price competition " ++
@@ -614,6 +705,7 @@ def gap_mBertrand_monotone : GapEntry := {
   name := "mBertrand_monotone"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Tirole 1988, *Theory of Industrial Organization*, MIT " ++
     "Press, Ch. 5 §5.7 (entry under fixed cost; per-firm " ++
@@ -634,6 +726,7 @@ def gap_mBertrand_one_le_bundled : GapEntry := {
   name := "mBertrand_one_le_bundled"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{lem:bertrand}` saturation-vs-bundled " ++
     "comparison: paper-novel claim that the saturated-Bertrand " ++
@@ -661,6 +754,7 @@ def gap_FOEconomics_Mathlib_BLOCKED : GapEntry := {
   name := "FOEconomics_Mathlib_encoding"
   status := GapStatus.gapBlocked
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Mathlib does not contain a formalisation of welfare " ++
     "economics, CES production functions, or the " ++
@@ -683,6 +777,7 @@ def gap_CredenceGoodIO_Mathlib_BLOCKED : GapEntry := {
   name := "CredenceGoodIO_Mathlib_encoding"
   status := GapStatus.gapBlocked
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Mathlib does not contain a formalisation of " ++
     "industrial-organization auction/Bertrand equilibrium " ++
@@ -704,6 +799,7 @@ def gap_CaptureGame_Mathlib_BLOCKED : GapEntry := {
   name := "CaptureGame_Mathlib_encoding"
   status := GapStatus.gapBlocked
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Mathlib does not contain a formalisation of the " ++
     "menu-auction game-theoretic apparatus (Bernheim-" ++
@@ -727,6 +823,7 @@ def gap_thm_characterization_suff_CLOSED : GapEntry := {
   name := "thm_characterization_suff"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:characterization}` (⇐)"
   attackHistory := []
   scope :=
@@ -740,6 +837,7 @@ def gap_thm_characterization_nec_CLOSED : GapEntry := {
   name := "thm_characterization_nec"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:characterization}` (⇒)"
   attackHistory := []
   scope :=
@@ -755,6 +853,7 @@ def gap_thm_characterization_CLOSED : GapEntry := {
   name := "thm_characterization"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:characterization}`"
   attackHistory := []
   scope :=
@@ -768,6 +867,7 @@ def gap_prop_four_mechanisms_Mbeta_CLOSED : GapEntry := {
   name := "prop_four_mechanisms_Mbeta"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{prop:four_mechanisms}` clause (M_β)"
   attackHistory := []
@@ -781,6 +881,7 @@ def gap_prop_four_mechanisms_Mgamma_CLOSED : GapEntry := {
   name := "prop_four_mechanisms_Mgamma"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{prop:four_mechanisms}` clause (M_γ)"
   attackHistory := []
@@ -794,6 +895,7 @@ def gap_prop_four_mechanisms_Mdelta_CLOSED : GapEntry := {
   name := "prop_four_mechanisms_Mdelta"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{prop:four_mechanisms}` clause (M_δ)"
   attackHistory := []
@@ -808,6 +910,7 @@ def gap_thm_separation_CLOSED : GapEntry := {
   name := "thm_separation"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:separation}`"
   attackHistory := []
   scope :=
@@ -821,6 +924,7 @@ def gap_thm_separation_welfare_invariant_CLOSED : GapEntry := {
   name := "thm_separation_welfare_invariant"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{thm:separation}` composed with " ++
     "`\\label{thm:characterization}` (⇐)"
@@ -836,6 +940,7 @@ def gap_thm_gini_CLOSED : GapEntry := {
   name := "thm_gini"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:gini}`"
   attackHistory := []
   scope :=
@@ -850,6 +955,7 @@ def gap_thm_gini_theta_invariance_CLOSED : GapEntry := {
   name := "thm_gini_theta_invariance"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{thm:gini}` Appendix A.2 " ++
     "\"Independence of θ\""
@@ -864,6 +970,7 @@ def gap_cor_gini_CLOSED : GapEntry := {
   name := "cor_gini"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{cor:gini}`"
   attackHistory := []
   scope :=
@@ -877,6 +984,7 @@ def gap_thm_gini_bound_mono_mu_CLOSED : GapEntry := {
   name := "thm_gini_bound_mono_mu"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{thm:gini}` \"The bound is monotone " ++
     "decreasing in each of μ and ν separately\""
@@ -891,6 +999,7 @@ def gap_thm_gini_bound_mono_nu_CLOSED : GapEntry := {
   name := "thm_gini_bound_mono_nu"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{thm:gini}` \"The bound is monotone " ++
     "decreasing in each of μ and ν separately\""
@@ -905,6 +1014,7 @@ def gap_single_lever_bound_CLOSED : GapEntry := {
   name := "single_lever_bound"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{thm:antitipping}` Appendix A.3 " ++
     "Step 7 (eq:single_lever)"
@@ -920,6 +1030,7 @@ def gap_lambdaEff_at_zero_CLOSED : GapEntry := {
   name := "lambdaEff_at_zero"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{thm:antitipping}` Appendix A.3 " ++
     "Step 6 boundary check"
@@ -936,6 +1047,7 @@ def gap_thm_antitipping_CLOSED : GapEntry := {
   name := "thm_antitipping"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:antitipping}`"
   attackHistory := []
   scope :=
@@ -949,6 +1061,7 @@ def gap_thm_t4_binding_CLOSED : GapEntry := {
   name := "thm_t4_binding"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:t4_binding}`"
   attackHistory := []
   scope :=
@@ -963,6 +1076,7 @@ def gap_thm_t4_binding_at_boundary_CLOSED : GapEntry := {
   name := "thm_t4_binding_at_boundary"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{thm:t4_binding}` Appendix A.4 " ++
     "(boundary case (ω,π) = (1,1))"
@@ -977,6 +1091,7 @@ def gap_lem_independence_CLOSED : GapEntry := {
   name := "lem_independence"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{lem:independence}`"
   attackHistory := []
   scope :=
@@ -989,6 +1104,7 @@ def gap_lem_lizzeri_CLOSED : GapEntry := {
   name := "lem_lizzeri"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{lem:lizzeri}`"
   attackHistory := []
   scope :=
@@ -1000,6 +1116,7 @@ def gap_lem_bertrand_CLOSED : GapEntry := {
   name := "lem_bertrand"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{lem:bertrand}`"
   attackHistory := []
   scope :=
@@ -1013,6 +1130,7 @@ def gap_thm_longrun_CLOSED : GapEntry := {
   name := "thm_longrun"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:longrun}`"
   attackHistory := []
   scope :=
@@ -1027,6 +1145,7 @@ def gap_thm_longrun_policy_invariance_CLOSED : GapEntry := {
   name := "thm_longrun_policy_invariance"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li 2026, `\\label{thm:longrun}` Step 5 " ++
     "(equilibrium-policy θ-invariance content)"
@@ -1042,6 +1161,7 @@ def gap_prop_multi_agency_CLOSED : GapEntry := {
   name := "prop_multi_agency"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{prop:multi_agency}`"
   attackHistory := []
   scope :=
@@ -1054,8 +1174,10 @@ def gap_prop_multi_agency_CLOSED : GapEntry := {
 
 /-- All gap entries in canonical order. -/
 def allGaps : List GapEntry := [
-  -- Cat 3 paper-novel atomic structural equations
+  -- Cat 2 external textbook (welfare-economics factorisation)
   gap_welfareFactorsThroughAllocation,
+  -- Cat 3 paper-novel atomic structural equations (separation +
+  -- binding + long-run)
   gap_SC1_implements_Malpha,
   gap_SC3_implements_Mbeta,
   gap_lemma_independence_gap,
@@ -1064,14 +1186,17 @@ def allGaps : List GapEntry := [
   gap_long_run_step4_zero_lobbying,
   gap_long_run_step5_mStar_invariance,
   gap_long_run_step5_bmuStar_invariance,
-  -- Cat 3 paper-novel typed primitives (carriers)
+  -- Cat 3 paper-novel typed primitives (carriers) + paper-stated
+  -- atomic structural equations on η
   gap_kappa1_carrier,
   gap_kappa2_carrier,
   gap_sK_carrier,
   gap_eta_attenuation_carrier,
   gap_eta_attenuation_at_zero,
   gap_eta_attenuation_unit_interval,
-  -- Cat 2 atomic external textbook axioms
+  -- Cat 2 external textbook + Cat 3 paper-novel structural
+  -- equations (mixed: Gini bound channels + Lizzeri/Bertrand
+  -- binding apparatus)
   gap_bestResponseUniqueAtThetaInvariantWelfare,
   gap_kappa1_pos,
   gap_kappa2_pos,
@@ -1118,15 +1243,17 @@ def allGaps : List GapEntry := [
   gap_prop_multi_agency_CLOSED
 ]
 
-/-- Status-keyed counts: `(open, partial, blocked, deadEnd, closed)`. -/
-def gapCounts : Nat × Nat × Nat × Nat × Nat :=
+/-- Status-keyed counts:
+    `(open, partial, blocked, deadEnd, closed, closedConditional)`. -/
+def gapCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
   let countWhere (s : GapStatus) : Nat :=
     (allGaps.filter (fun g => g.status = s)).length
   ( countWhere GapStatus.gapOpen
   , countWhere GapStatus.gapPartial
   , countWhere GapStatus.gapBlocked
   , countWhere GapStatus.gapDeadEnd
-  , countWhere GapStatus.gapClosed )
+  , countWhere GapStatus.gapClosed
+  , countWhere GapStatus.gapClosedConditional )
 
 /-- InputCategory-keyed counts: `(cat1Mathlib, cat2External, cat3PaperNovel, notInput)`. -/
 def inputCategoryCounts : Nat × Nat × Nat × Nat :=
@@ -1137,38 +1264,66 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
   , countWhere InputCategory.cat3PaperNovel
   , countWhere InputCategory.notInput )
 
-#eval s!"AccessOrthogonality gap-ledger inventory (status):  open={(gapCounts).1} partial={(gapCounts).2.1} blocked={(gapCounts).2.2.1} deadEnd={(gapCounts).2.2.2.1} closed={(gapCounts).2.2.2.2}"
+/-- Cat3SubType-keyed counts:
+    `(carrier, hypothesisPredicate, structuralEquation, workingAssumption, conditionalHypothesis, notCat3)`. -/
+def cat3SubTypeCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
+  let countWhere (s : Cat3SubType) : Nat :=
+    (allGaps.filter (fun g => g.cat3SubType = s)).length
+  ( countWhere Cat3SubType.carrier
+  , countWhere Cat3SubType.hypothesisPredicate
+  , countWhere Cat3SubType.structuralEquation
+  , countWhere Cat3SubType.workingAssumption
+  , countWhere Cat3SubType.conditionalHypothesis
+  , countWhere Cat3SubType.notCat3 )
 
-#eval s!"AccessOrthogonality gap-ledger inventory (input):   cat1Mathlib={(inputCategoryCounts).1} cat2External={(inputCategoryCounts).2.1} cat3PaperNovel={(inputCategoryCounts).2.2.1} notInput={(inputCategoryCounts).2.2.2}"
+#eval s!"AccessOrthogonality gap-ledger inventory (status):    open={(gapCounts).1} partial={(gapCounts).2.1} blocked={(gapCounts).2.2.1} deadEnd={(gapCounts).2.2.2.1} closed={(gapCounts).2.2.2.2.1} closedConditional={(gapCounts).2.2.2.2.2}"
+
+#eval s!"AccessOrthogonality gap-ledger inventory (input):     cat1Mathlib={(inputCategoryCounts).1} cat2External={(inputCategoryCounts).2.1} cat3PaperNovel={(inputCategoryCounts).2.2.1} notInput={(inputCategoryCounts).2.2.2}"
+
+#eval s!"AccessOrthogonality gap-ledger inventory (Cat 3 sub): carrier={(cat3SubTypeCounts).1} hypothesisPredicate={(cat3SubTypeCounts).2.1} structuralEquation={(cat3SubTypeCounts).2.2.1} workingAssumption={(cat3SubTypeCounts).2.2.2.1} conditionalHypothesis={(cat3SubTypeCounts).2.2.2.2.1} notCat3={(cat3SubTypeCounts).2.2.2.2.2}"
 
 #eval s!"Total entries: {allGaps.length}"
 
 /-! ### Inventory summary
 
-  The live status counts and input-category counts are
+  The live status / input-category / Cat 3 sub-type counts are
   printed by the `#eval` calls above (run
-  `lake env lean AccessOrthogonality/Ledger.lean` to see
-  them).  The axiom names by category:
+  `lake env lean AccessOrthogonality/Ledger.lean` to see them).
+  Axiom names by category:
 
-    Cat 2 propositional (external published textbook):
+    Cat 2 propositional (external published textbook —
+    Mas-Colell-Whinston-Green + Acemoglu-Restrepo + Lizzeri +
+    Shorrocks + Tirole):
       welfareFactorsThroughAllocation,
       kappa1_pos, kappa2_pos, sK_nonneg,
       shorrocks_additive_decomposition_atomic,
       mBertrand_nonneg, mBertrand_monotone
 
-    Cat 3 carrier axioms (Li 2026):
+    Cat 3 carrier axioms (Li 2026 paper-introduced primitives,
+    sub-type: carrier):
       kappa1, kappa2, sK, eta_attenuation, mBertrand
 
-    Cat 3 propositional structural equations (paper-stated):
-      bestResponseUniqueAtThetaInvariantWelfare,
+    Cat 3 structural defining equations (Li 2026 paper-stated
+    atomic equations on the carriers, sub-type:
+    structuralEquation):
+      bestResponseUniqueAtThetaInvariantWelfare
+        (necessity bridge — MWG Prop 5.C.2(v) on Cobb-Douglas
+        isocline + Case 1+Case 2 case-split),
       SC1_implements_Malpha, SC3_implements_Mbeta,
       lemma_independence_gap, welfare_gap_at_reference,
-      lemma_lizzeri_bundled_rent,
-      mBertrand_one_le_bundled,
-      capital_share_channel_contribution,
-      verification_rent_channel_contribution,
-      gini_two_channel_partition,
-      lerman_yitzhaki_comonotonicity_translation,
+      lemma_lizzeri_bundled_rent
+        (integrated-seller-certifier rent — extension of
+        Lizzeri 1999 to integrated case),
+      mBertrand_one_le_bundled
+        (saturated-Bertrand-vs-bundled rent bound),
+      capital_share_channel_contribution
+        (Acemoglu-Restrepo × Korinek-Vipra composition),
+      verification_rent_channel_contribution
+        (Lizzeri-extension × Bertrand × κ_2 composition),
+      gini_two_channel_partition (paper-novel HA-7),
+      lerman_yitzhaki_comonotonicity_translation
+        (Lerman-Yitzhaki 1985 × GE_0-bound × first-order
+        factor-share linearisation composition),
       long_run_step1_profit_zero,
       long_run_step4_zero_lobbying,
       long_run_step5_mStar_invariance,
@@ -1176,8 +1331,39 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
       eta_attenuation_at_zero,
       eta_attenuation_unit_interval
 
-  Lean kernel (not declared here): propext, Classical.choice,
-  Quot.sound.
+  Cat 3 sub-types not used in this project:
+  `hypothesisPredicate` (paper's scope conditions (SC1)–(SC6),
+  (HA-1)–(HA-9), regime structures, and decoupling predicates
+  are all concrete `def`s in `Basic.lean`, not axiomatized
+  predicates), `workingAssumption` (every axiom in this
+  formalisation is a definitional atom — carrier or paper-
+  stated structural equation — not a temporarily-axiomatized
+  higher-level claim with a close target), `conditionalHypothesis`
+  (paper conclusions are not conditional on external open
+  problems like RH/BSD/Hodge/P≠NP).
+
+  Cat 3 / Cat 2+Cat 3 ratio (v6 §3.4.6 reductionism guard):
+  22 Cat 3 / (7 Cat 2 + 22 Cat 3) = 22 / 29 ≈ 75.9% (> 50%
+  threshold).  Driver: the paper's three independent
+  theorem clusters (characterization, gini bound, antitipping,
+  t4 binding, longrun) each contribute several paper-stated
+  atomic structural equations on paper-introduced primitives
+  (κ_1, κ_2, s_K, η, m_Bertrand).  The Cat 2 column captures
+  only welfare-economics-101 + factor-share positivity +
+  Bertrand rent monotonicity / non-negativity + Shorrocks 1982
+  additive decomposability.  Each Cat 3 entry has been through
+  ≥2 reductionism check rounds (Cat 1? Cat 2?) per the
+  `attackHistory` field; the ≥50% over-threshold reflects the
+  paper's genuine novelty over standard welfare economics, not
+  reaching-for-axiom-too-fast.  Future rounds may further
+  decompose composite Cat 3 entries (`bestResponseUniqueAt-
+  ThetaInvariantWelfare`, `lemma_lizzeri_bundled_rent`,
+  `gini_two_channel_partition`) into smaller (Cat 2 + Cat 3)
+  pairs once isocline / welfare-via-quality / integrated-rent
+  apparatus is built out.
+
+  Lean kernel (Cat 0; not declared here): propext,
+  Classical.choice, Quot.sound.
 -/
 
 end AccessOrthogonality.Ledger

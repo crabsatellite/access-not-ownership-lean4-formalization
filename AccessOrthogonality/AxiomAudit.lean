@@ -5,9 +5,9 @@
   theorem.
 
   Trust policy.  Every `axiom` declaration in the project
-  falls into exactly one of three categories (per
-  `feedback_gap_ledger_in_lean4` ATOMIC MINIMAL UNITS
-  interpretation):
+  falls into exactly one of three paper-side categories
+  (per `feedback_gap_ledger_in_lean4` v6 four-input-category
+  ATOMIC MINIMAL UNITS interpretation):
 
     Cat 1 — Mathlib-derivable: claim closes via Mathlib +
             kernel.  Must be encoded as `theorem`, not
@@ -26,10 +26,19 @@
     Cat 3 — Paper-novel: typed primitive carrier (`axiom`) or
             paper-stated atomic structural equation
             (`axiom`).  Cited only to Li 2026 labelled
-            statements.
+            statements.  v6 sub-classification: every Cat 3
+            axiom in this project is either sub-type
+            `carrier` (5 entries: paper-introduced typed
+            primitives κ_1, κ_2, s_K, η, m_Bertrand) or
+            sub-type `structuralEquation` (17 entries:
+            paper-stated atomic defining equations on the
+            carriers).  Sub-types `hypothesisPredicate`,
+            `workingAssumption`, `conditionalHypothesis` are
+            not used (see ledger inventory summary).
 
-  Plus the Lean kernel axioms (`propext`, `Classical.choice`,
-  `Quot.sound`), provided by Lean / Mathlib core.
+  Plus the Lean kernel layer (Cat 0; `propext`,
+  `Classical.choice`, `Quot.sound`) provided by Lean /
+  Mathlib core.
 
   Constraints.  No (E) custom-scaffolding axioms (naked
   constants, abstract-type-inhabitation stipulations).  No
