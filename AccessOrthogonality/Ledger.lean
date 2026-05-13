@@ -420,39 +420,153 @@ def gap_eta_attenuation_unit_interval : GapEntry := {
        Cat 3 paper-novel structural equations
        (mixed-citation section) -/
 
-/-- (Characterization) Necessity bridge via Case 1+Case 2. -/
-def gap_bestResponseUniqueAtThetaInvariantWelfare : GapEntry := {
-  name := "bestResponseUniqueAtThetaInvariantWelfare"
+/-! ### v0.3 §3.4.6 reductionism decomposition of former
+       `gap_bestResponseUniqueAtThetaInvariantWelfare` -/
+
+/-- (Characterization) Case-split discriminator: same-isocline. -/
+def gap_OnSameIsocline_predicate : GapEntry := {
+  name := "OnSameIsocline"
+  status := GapStatus.gapOpen
+  inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.hypothesisPredicate
+  paperSource :=
+    "Li 2026, `\\label{thm:characterization}` (⇒) Necessity " ++
+    "proof Case 1 (\"the two allocations lie on different " ++
+    "isoclines of `c^β d^γ`\") vs. Case 2 (\"the two " ++
+    "allocations lie on the same isocline\").  Paper-" ++
+    "introduced isocline-classifier predicate at the basis " ++
+    "of the case-split argument."
+  attackHistory := [
+    "v0.3 (audit R11): created in §3.4.6 reductionism " ++
+      "decomposition of former Cat 3 atomic " ++
+      "`bestResponseUniqueAtThetaInvariantWelfare`.  " ++
+      "Same-isocline predicate is the paper-stated " ++
+      "case-split discriminator; carried as a Cat 3 " ++
+      "hypothesisPredicate to expose the case-split " ++
+      "structure at the Lean level.",
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib has no " ++
+      "Cobb-Douglas isocline classifier at the abstract " ++
+      "BestResponseMap level; this is the paper's specific " ++
+      "case-split apparatus.",
+    "v6 reductionism Cat 2?: CLEAR-NO — the case-split " ++
+      "discriminator itself is paper-introduced (paper " ++
+      "§4.3 Necessity proof structure); not a free-standing " ++
+      "external textbook predicate.  MWG Prop 5.C.2(v) is " ++
+      "what gets APPLIED inside Case 2 (recorded as the " ++
+      "separate Cat 2 atomic " ++
+      "`mwg_cost_min_uniqueness_isocline`)."
+  ]
+  scope :=
+    "Paper §4.3 same-isocline predicate over " ++
+    "`(BestResponseMap, OwnershipType, OwnershipType, Regime)`.  " ++
+    "Carrier-only Prop at the abstract layer; substantive " ++
+    "paper content lives in the two consuming atomics."
+}
+
+/-- (Characterization) MWG Prop 5.C.2(v) cost-min uniqueness. -/
+def gap_mwg_cost_min_uniqueness_isocline : GapEntry := {
+  name := "mwg_cost_min_uniqueness_isocline"
+  status := GapStatus.gapOpen
+  inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
+  paperSource :=
+    "Mas-Colell, Whinston, Green, *Microeconomic Theory*, " ++
+    "Oxford University Press 1995, §5.C, Proposition " ++
+    "5.C.2(v) (cost-min uniqueness on strictly-convex " ++
+    "production sets under strictly positive input prices).  " ++
+    "Paper Case 2 of `\\label{thm:characterization}` (⇒) " ++
+    "Necessity invokes this directly: \"the cost-minimising " ++
+    "point on the isocline is unique given input prices " ++
+    "r_c and w_d ... is a single point\"."
+  attackHistory := [
+    "v0.3 (audit R11): extracted as a separate Cat 2 atomic " ++
+      "in the §3.4.6 reductionism decomposition of former " ++
+      "Cat 3 atomic `bestResponseUniqueAtThetaInvariantWelfare`.  " ++
+      "The textbook content (MWG 5.C.2(v) cost-min uniqueness " ++
+      "on strictly-convex isoquants) is now explicitly " ++
+      "chained in the Lean signature of the derived theorem, " ++
+      "not absorbed into the paper-novel atomic."
+  ]
+  scope :=
+    "`∀ (br : BestResponseMap) (R : Regime) (θ₁ θ₂ : " ++
+    "OwnershipType), OnSameIsocline br θ₁ θ₂ R → br.alloc " ++
+    "θ₁ R = br.alloc θ₂ R`.  Cobb-Douglas isocline satisfies " ++
+    "the strict-concavity-on-level-sets hypothesis of MWG " ++
+    "5.C.2(v).  Full Lean derivation deferred to " ++
+    "`gap_FOEconomics_Mathlib_BLOCKED` (MWG-style producer-" ++
+    "theory cost-min apparatus absent from Mathlib)."
+}
+
+/-- (Characterization) Paper Case 1 contradiction. -/
+def gap_case_1_different_isoclines_implies_BR_invariant : GapEntry := {
+  name := "case_1_different_isoclines_implies_BR_invariant"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
-    "Li 2026, `\\label{thm:characterization}` Necessity " ++
-    "direction Case 1+Case 2: paper-novel application of " ++
-    "MWG (1995) Prop 5.C.2(v) (cost-min uniqueness on " ++
-    "strictly-convex isoquants — Cat 2 textbook fact) to " ++
-    "the Cobb-Douglas isocline of the quality dynamics " ++
-    "`\\eqref{eq:quality_dynamics}`, combined with the " ++
-    "Case 1 (different isoclines) vs. Case 2 (same " ++
-    "isocline) case-split + cost-equivalence contradiction."
+    "Li 2026, `\\label{thm:characterization}` (⇒) Necessity " ++
+    "Case 1: \"the two allocations lie on different isoclines " ++
+    "of `c^β d^γ`.  Then `q_i^*` differs, hence `CS` differs " ++
+    "(since `∂CS/∂q_i ≠ 0` generically by SC1+SC6), " ++
+    "contradicting θ-invariance of `W^*`.\"  Paper-novel " ++
+    "application of the welfare-functional decomposition " ++
+    "`W = CS + ∑Π - T` + the SC1+SC6 quality-sensitivity to " ++
+    "force the different-isoclines contradiction."
   attackHistory := [
-    "v0.2 (audit R7): re-categorised Cat 2 → Cat 3.  " ++
-      "Textbook ingredient (MWG Prop 5.C.2(v)) is " ++
-      "opaque-carrier-bound but does not directly yield " ++
-      "the implication on the welfare functional.  Case 1 " ++
-      "+ Case 2 case-split + cost-equivalence contradiction " ++
-      "is paper-novel.  Future decomposition: extract " ++
-      "MWG Prop 5.C.2(v) as a separate Cat 2 atomic + " ++
-      "Case 2 contradiction as a separate Cat 3 atomic; " ++
-      "requires building isocline/welfare-via-quality " ++
-      "apparatus currently abstracted into " ++
-      "`WelfareFunctional`."
+    "v0.3 (audit R11): created in the §3.4.6 reductionism " ++
+      "decomposition of former Cat 3 atomic " ++
+      "`bestResponseUniqueAtThetaInvariantWelfare`.  Case 1 " ++
+      "contradiction is the paper-novel half of the " ++
+      "Necessity argument (Case 2 reduces to MWG 5.C.2(v) " ++
+      "via `mwg_cost_min_uniqueness_isocline`).",
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib has no " ++
+      "welfare-functional decomposition or quality-dynamics " ++
+      "apparatus at this abstraction.",
+    "v6 reductionism Cat 2?: CLEAR-NO — the Case 1 " ++
+      "contradiction is paper-specific; MWG 5.C.2(v) covers " ++
+      "Case 2 only.  No external textbook directly states " ++
+      "\"different isoclines + θ-invariant welfare → BR " ++
+      "coincides\" at this level of abstraction."
+  ]
+  scope :=
+    "`∀ (W : WelfareFunctional) (br : BestResponseMap) (a : " ++
+    "AccessVector) (R : Regime), WelfareThetaInvariant W a R " ++
+    "→ ∀ (θ₁ θ₂ : OwnershipType), ¬ OnSameIsocline br θ₁ θ₂ " ++
+    "R → br.alloc θ₁ R = br.alloc θ₂ R`.  Atomic Case 1 " ++
+    "contradiction step."
+}
+
+/-- (Characterization) Derived necessity bridge (former Cat 3 atomic). -/
+def gap_bestResponseUniqueAtThetaInvariantWelfare_CLOSED : GapEntry := {
+  name := "bestResponseUniqueAtThetaInvariantWelfare"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource :=
+    "Li 2026, `\\label{thm:characterization}` (⇒) Necessity " ++
+    "full argument.  v0.3 derived theorem composing Case 1 " ++
+    "(Cat 3 `case_1_different_isoclines_implies_BR_invariant`) " ++
+    "and Case 2 (Cat 2 `mwg_cost_min_uniqueness_isocline` " ++
+    "via the same-isocline `OnSameIsocline` discriminator) " ++
+    "by classical case-split."
+  attackHistory := [
+    "v0.2 (audit R7): re-categorised Cat 2 → Cat 3 (former " ++
+      "single-atomic composite).  Future-decomposition note " ++
+      "flagged.",
+    "v0.3 (audit R11): §3.4.6 reductionism decomposition " ++
+      "executed.  Former single Cat 3 atomic → 3 atomics " ++
+      "(`OnSameIsocline` Cat 3 hypothesisPredicate + " ++
+      "`mwg_cost_min_uniqueness_isocline` Cat 2 + " ++
+      "`case_1_different_isoclines_implies_BR_invariant` " ++
+      "Cat 3 structuralEquation) + this derived theorem.  " ++
+      "Cat 3 count effect: 1 → 2 (+1).  Cat 2 count effect: " ++
+      "0 → 1 (+1).  Total Cat 2 + Cat 3 count: +2."
   ]
   scope :=
     "Necessity direction of Theorem~\\ref{thm:characterization}: " ++
     "if welfare is θ-invariant, then the best-response is " ++
-    "θ-invariant.  Encodes the full Case 1+Case 2 argument " ++
-    "as a single atomic bridge."
+    "θ-invariant.  Derived theorem composing the 3 atomics " ++
+    "via classical case-split on `OnSameIsocline`."
 }
 
 /-- (Gini) κ_1 positivity for η < 1. -/
@@ -579,30 +693,115 @@ def gap_shorrocks_additive_decomposition_atomic : GapEntry := {
     "`gini_two_channel_partition`."
 }
 
-/-- (Gini) Two-channel partition under HA-7. -/
-def gap_gini_two_channel_partition : GapEntry := {
-  name := "gini_two_channel_partition"
+/-! ### v0.3 §3.4.6 reductionism decomposition of former
+       `gap_gini_two_channel_partition` -/
+
+/-- (Gini) HA-7 channels-not-anti-correlated predicate. -/
+def gap_HA7_channels_not_anti_correlated : GapEntry := {
+  name := "HA7_channels_not_anti_correlated"
+  status := GapStatus.gapOpen
+  inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.hypothesisPredicate
+  paperSource :=
+    "Li 2026, `\\label{thm:gini}` Appendix A.2 working " ++
+    "assumption HA-7: \"the capital-rent and verification-" ++
+    "rent channels are not anti-correlated in the income " ++
+    "distribution\".  Paper-stated working-assumption " ++
+    "predicate (regime-condition on the income-rank " ++
+    "correlation between the two channels)."
+  attackHistory := [
+    "v0.3 (audit R11): extracted as a Cat 3 hypothesis-" ++
+      "predicate in the §3.4.6 reductionism decomposition " ++
+      "of former Cat 3 atomic `gini_two_channel_partition`.  " ++
+      "HA-7 is the paper's explicit named working assumption; " ++
+      "carrying it as a Prop exposes the discipline at the " ++
+      "Lean level.",
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib has no " ++
+      "income-rank-correlation apparatus on inequality " ++
+      "indices.",
+    "v6 reductionism Cat 2?: CLEAR-NO — HA-7 is paper-" ++
+      "specific working assumption; not a free-standing " ++
+      "external theorem."
+  ]
+  scope :=
+    "HA-7 carrier — paper-introduced working-assumption " ++
+    "predicate over `(InequalityFunctional, OwnershipType, " ++
+    "AccessVector, Regime)`.  Carrier-only Prop at our " ++
+    "abstraction layer; substantive paper content lives in " ++
+    "the consuming axiom `channels_exhaust_under_HA7`."
+}
+
+/-- (Gini) Channel-exhaustion structural step under HA-7. -/
+def gap_channels_exhaust_under_HA7 : GapEntry := {
+  name := "channels_exhaust_under_HA7"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
-    "Li 2026, `\\label{thm:gini}` Appendix A.2 working " ++
-    "assumption HA-7 (\"the capital-rent and verification-" ++
-    "rent channels are not anti-correlated\") + the " ++
-    "two-channel partition of paper Appendix A.2."
+    "Li 2026, `\\label{thm:gini}` Appendix A.2 \"Combining " ++
+    "the channels\": under HA-7, the GE_0 deviation " ++
+    "decomposes additively as the sum of (i) the capital-" ++
+    "share-channel contribution and (ii) the verification-" ++
+    "rent-channel contribution.  Paper-novel CHANNEL-" ++
+    "EXHAUSTION step that consumes HA-7 to discharge the " ++
+    "no-other-channel-reverses-the-direction requirement."
   attackHistory := [
-    "v0.2 (audit R3): created.  Carries the paper-novel " ++
-      "claim that capital-share + verification-rent EXHAUST " ++
-      "the GE_0 decomposition under HA-7.  Companion atomic " ++
-      "axiom: `shorrocks_additive_decomposition_atomic` " ++
-      "(Cat 2 Shorrocks 1982)."
+    "v0.3 (audit R11): created in the §3.4.6 reductionism " ++
+      "decomposition of former Cat 3 atomic " ++
+      "`gini_two_channel_partition`.  Now explicitly " ++
+      "consumes the HA-7 hypothesisPredicate; channel-" ++
+      "exhaustion is the paper-novel structural step.",
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib has no " ++
+      "factor-source decomposition exhaustiveness for " ++
+      "GE_0 at this abstraction.",
+    "v6 reductionism Cat 2?: CLEAR-NO — the EXHAUSTIVENESS " ++
+      "of the two-channel partition is paper-specific.  " ++
+      "Shorrocks 1982 (Cat 2 atomic " ++
+      "`shorrocks_additive_decomposition_atomic`) gives " ++
+      "additive-decomposability of GE_0 along ANY factor-" ++
+      "source partition; the paper's claim that CAPITAL-" ++
+      "SHARE + VERIFICATION-RENT specifically exhaust the " ++
+      "decomposition under HA-7 is paper-novel."
+  ]
+  scope :=
+    "Given `HA7_channels_not_anti_correlated I θ a R`, for " ++
+    "any `capContrib ≤ κ_1·s_K·(1-μ)` and `verifContrib ≤ " ++
+    "κ_2·(1-ν)`, the GE_0 deviation is at most `capContrib " ++
+    "+ verifContrib`.  Atomic structural step consuming " ++
+    "HA-7 explicitly."
+}
+
+/-- (Gini) Derived two-channel partition (former Cat 3 atomic). -/
+def gap_gini_two_channel_partition_CLOSED : GapEntry := {
+  name := "gini_two_channel_partition"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource :=
+    "Li 2026, `\\label{thm:gini}` Appendix A.2.  v0.3 " ++
+    "derived theorem composing `HA7_channels_not_anti_-" ++
+    "correlated` (Cat 3 hypothesisPredicate) with " ++
+    "`channels_exhaust_under_HA7` (Cat 3 structuralEquation)."
+  attackHistory := [
+    "v0.2 (audit R3): created as a single Cat 3 atomic " ++
+      "absorbing both HA-7 + channel-exhaustion.",
+    "v0.3 (audit R11): §3.4.6 reductionism decomposition " ++
+      "executed.  Former single Cat 3 atomic → 2 atomics " ++
+      "(`HA7_channels_not_anti_correlated` Cat 3 " ++
+      "hypothesisPredicate + `channels_exhaust_under_HA7` " ++
+      "Cat 3 structuralEquation) + this derived theorem.  " ++
+      "Cat 3 count effect: 1 → 2 (+1; both atomic but each " ++
+      "is a strictly smaller paper-stated step).  Cat 2 " ++
+      "count effect: 0 (unchanged)."
   ]
   scope :=
     "Atomic partition statement: given bounds on the " ++
     "capital-share channel (≤ κ_1·s_K·(1-μ)) and the " ++
     "verification-rent channel (≤ κ_2·(1-ν)), the GE_0 " ++
-    "deviation is bounded by their sum.  Encodes paper " ++
-    "HA-7."
+    "deviation is bounded by their sum.  Derived theorem " ++
+    "composing the 2 atomics; HA-7 discharged at the " ++
+    "abstraction layer as `True` (paper-stated working-" ++
+    "assumption Prop)."
 }
 
 /-- (Gini) Lerman-Yitzhaki comonotonicity translation. -/
@@ -631,29 +830,115 @@ def gap_lerman_yitzhaki_comonotonicity_translation : GapEntry := {
     "form as the GE_0 bound to first order in factor shares."
 }
 
-/-- (Binding) Lemma~\ref{lem:lizzeri} — bundled rent existence. -/
-def gap_lemma_lizzeri_bundled_rent : GapEntry := {
-  name := "lemma_lizzeri_bundled_rent"
+/-! ### v0.3 §3.4.6 reductionism decomposition of former
+       `gap_lemma_lizzeri_bundled_rent` -/
+
+/-- (Binding) Lizzeri 1999 Prop 1 — separate-certifier rent. -/
+def gap_lizzeri_1999_separate_certifier_rent : GapEntry := {
+  name := "lizzeri_1999_separate_certifier_rent"
+  status := GapStatus.gapOpen
+  inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
+  paperSource :=
+    "Lizzeri, Alessandro, \"Information Revelation and " ++
+    "Certification Intermediaries,\" *RAND Journal of " ++
+    "Economics* 30(2), 1999, pp. 214–231, Proposition 1 " ++
+    "(monopoly certifier with rational consumer expectations " ++
+    "optimally discloses only whether quality is above or " ++
+    "below the purchase-supporting threshold; extracts " ++
+    "positive information-rent surplus `m_separate > 0`)."
+  attackHistory := [
+    "v0.3 (audit R11): extracted as a separate Cat 2 atomic " ++
+      "in the §3.4.6 reductionism decomposition of former " ++
+      "Cat 3 atomic `lemma_lizzeri_bundled_rent`.  Base " ++
+      "Lizzeri 1999 Prop 1 (separate-intermediary case) is " ++
+      "the EXTERNAL textbook fact on which paper Lemma " ++
+      "`\\label{lem:lizzeri}` builds; the integrated " ++
+      "extension is the paper-novel direction (recorded as " ++
+      "`gap_bundled_extension_via_independence`)."
+  ]
+  scope :=
+    "`∃ m_separate : ℝ, 0 < m_separate` for the " ++
+    "SEPARATE-seller-and-intermediary configuration of " ++
+    "Lizzeri 1999.  Full Lean derivation deferred to " ++
+    "`gap_CredenceGoodIO_Mathlib_BLOCKED` (Lizzeri 1999 " ++
+    "Prop 1 + credence-good information-revelation " ++
+    "apparatus absent from Mathlib)."
+}
+
+/-- (Binding) Paper-novel integrated-extension via lem:independence. -/
+def gap_bundled_extension_via_independence : GapEntry := {
+  name := "bundled_extension_via_independence"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{lem:lizzeri}` + Remark " ++
-    "`\\label{rem:lizzeri_extension}`: integrated " ++
-    "seller-certifier rent, extension of Lizzeri (1999) " ++
-    "*RAND J. Econ.* 30(2):214–231 (which treats an " ++
-    "INDEPENDENT monopoly certifier facing a SEPARATE " ++
-    "seller) to the bundled-seller-certifier configuration " ++
-    "via Lemma~\\ref{lem:independence}."
+    "`\\label{rem:lizzeri_extension}`: \"The result is an " ++
+    "extension of \\citet{lizzeri1999information} to the " ++
+    "integrated seller-certifier configuration ... the " ++
+    "integrated case requires Lemma~\\ref{lem:independence} " ++
+    "to rule out the alternative micro-foundation in which " ++
+    "an integrated provider commits not to certify favorably " ++
+    "and the configuration collapses to seller-side " ++
+    "disclosure under signalling à la Akerlof (1970).\""
+  attackHistory := [
+    "v0.3 (audit R11): created in the §3.4.6 reductionism " ++
+      "decomposition of former Cat 3 atomic " ++
+      "`lemma_lizzeri_bundled_rent`.  Bundled extension is " ++
+      "the paper-novel direction (Remark " ++
+      "`\\label{rem:lizzeri_extension}`); the base " ++
+      "separate-certifier rent fact is now the Cat 2 atomic " ++
+      "`lizzeri_1999_separate_certifier_rent`.",
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib has no " ++
+      "credence-good seller-certifier IO apparatus.",
+    "v6 reductionism Cat 2?: CLEAR-NO — paper Remark " ++
+      "`\\label{rem:lizzeri_extension}` is explicit that " ++
+      "the integrated case is NOT in Lizzeri 1999 (\"Lizzeri " ++
+      "(1999) treats an independent monopolist certifier " ++
+      "facing a separate seller\") and the extension goes " ++
+      "via Lemma~\\ref{lem:independence}.  Albano-Lizzeri " ++
+      "(2001) covers a related but DISTINCT setup; not the " ++
+      "operative source.  Conclusion: paper-novel."
+  ]
+  scope :=
+    "`∀ (m_separate : ℝ), 0 < m_separate → ∃ m_bundled : ℝ, " ++
+    "0 < m_bundled`.  Atomic step: positive separate-" ++
+    "certifier rent extends to positive bundled rent under " ++
+    "the integrated-seller-certifier configuration of " ++
+    "Lemma~\\ref{lem:independence}."
+}
+
+/-- (Binding) Lemma~\ref{lem:lizzeri} — derived bundled rent (former Cat 3 atomic). -/
+def gap_lemma_lizzeri_bundled_rent_CLOSED : GapEntry := {
+  name := "lemma_lizzeri_bundled_rent"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource :=
+    "Li 2026, `\\label{lem:lizzeri}` + Remark " ++
+    "`\\label{rem:lizzeri_extension}`.  v0.3 derived theorem " ++
+    "composing `lizzeri_1999_separate_certifier_rent` (Cat 2 " ++
+    "base) with `bundled_extension_via_independence` (Cat 3 " ++
+    "paper-novel)."
   attackHistory := [
     "v0.2 (audit R2): re-categorised Cat 2 → Cat 3 after " ++
-      "verifying Lizzeri 1999 abstract treats SEPARATE " ++
-      "intermediary, not integrated seller-certifier. " ++
-      "The integrated-case rent claim is paper-novel " ++
-      "(Remark `\\label{rem:lizzeri_extension}` confirms " ++
-      "this explicitly)."
+      "verifying Lizzeri 1999 treats SEPARATE intermediary, " ++
+      "not integrated seller-certifier; original atomic " ++
+      "absorbed both directions.",
+    "v0.3 (audit R11): §3.4.6 reductionism decomposition " ++
+      "executed.  Former single Cat 3 atomic → 2 atomics " ++
+      "(`lizzeri_1999_separate_certifier_rent` Cat 2 + " ++
+      "`bundled_extension_via_independence` Cat 3 " ++
+      "structuralEquation) + this derived theorem.  Cat 3 " ++
+      "count effect: -1 + 1 = 0 (net 0; same count but " ++
+      "now properly chained through external textbook " ++
+      "base).  Cat 2 count effect: 0 → 1 (+1)."
   ]
-  scope := "∃ m_bundled : ℝ, 0 < m_bundled (integrated seller-certifier configuration)."
+  scope :=
+    "`∃ m_bundled : ℝ, 0 < m_bundled` (integrated seller-" ++
+    "certifier configuration).  Derived theorem composing " ++
+    "the 2 atomics."
 }
 
 /-- (Binding) Lemma~\ref{lem:bertrand} — `mBertrand` carrier. -/
@@ -1197,16 +1482,29 @@ def allGaps : List GapEntry := [
   -- Cat 2 external textbook + Cat 3 paper-novel structural
   -- equations (mixed: Gini bound channels + Lizzeri/Bertrand
   -- binding apparatus)
-  gap_bestResponseUniqueAtThetaInvariantWelfare,
+  -- v0.3 §3.4.6 reductionism decomposition:
+  -- bestResponseUniqueAtThetaInvariantWelfare → 3 atomics + 1 derived theorem
+  gap_OnSameIsocline_predicate,
+  gap_mwg_cost_min_uniqueness_isocline,
+  gap_case_1_different_isoclines_implies_BR_invariant,
+  gap_bestResponseUniqueAtThetaInvariantWelfare_CLOSED,
   gap_kappa1_pos,
   gap_kappa2_pos,
   gap_sK_nonneg,
   gap_capital_share_channel_contribution,
   gap_verification_rent_channel_contribution,
   gap_shorrocks_additive_decomposition_atomic,
-  gap_gini_two_channel_partition,
+  -- v0.3 §3.4.6 reductionism decomposition:
+  -- gini_two_channel_partition → 2 atomics + 1 derived theorem
+  gap_HA7_channels_not_anti_correlated,
+  gap_channels_exhaust_under_HA7,
+  gap_gini_two_channel_partition_CLOSED,
   gap_lerman_yitzhaki_comonotonicity_translation,
-  gap_lemma_lizzeri_bundled_rent,
+  -- v0.3 §3.4.6 reductionism decomposition:
+  -- lemma_lizzeri_bundled_rent → 2 atomics + 1 derived theorem
+  gap_lizzeri_1999_separate_certifier_rent,
+  gap_bundled_extension_via_independence,
+  gap_lemma_lizzeri_bundled_rent_CLOSED,
   -- mBertrand carrier + atomic facts
   gap_mBertrand_carrier,
   gap_mBertrand_nonneg,
@@ -1295,32 +1593,51 @@ def cat3SubTypeCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
     Mas-Colell-Whinston-Green + Acemoglu-Restrepo + Lizzeri +
     Shorrocks + Tirole):
       welfareFactorsThroughAllocation,
+      mwg_cost_min_uniqueness_isocline
+        (MWG 5.C.2(v); v0.3 §3.4.6 extracted from former
+        `bestResponseUniqueAtThetaInvariantWelfare` atomic),
       kappa1_pos, kappa2_pos, sK_nonneg,
       shorrocks_additive_decomposition_atomic,
+      lizzeri_1999_separate_certifier_rent
+        (Lizzeri 1999 Prop 1; v0.3 §3.4.6 extracted from
+        former `lemma_lizzeri_bundled_rent` atomic),
       mBertrand_nonneg, mBertrand_monotone
 
     Cat 3 carrier axioms (Li 2026 paper-introduced primitives,
     sub-type: carrier):
       kappa1, kappa2, sK, eta_attenuation, mBertrand
 
+    Cat 3 hypothesis predicates (Li 2026 paper-introduced
+    scope/regime predicates, sub-type: hypothesisPredicate;
+    added v0.3 §3.4.6):
+      OnSameIsocline
+        (paper §4.3 Case 1/Case 2 case-split discriminator),
+      HA7_channels_not_anti_correlated
+        (paper Appendix A.2 HA-7 working assumption)
+
     Cat 3 structural defining equations (Li 2026 paper-stated
     atomic equations on the carriers, sub-type:
     structuralEquation):
-      bestResponseUniqueAtThetaInvariantWelfare
-        (necessity bridge — MWG Prop 5.C.2(v) on Cobb-Douglas
-        isocline + Case 1+Case 2 case-split),
       SC1_implements_Malpha, SC3_implements_Mbeta,
       lemma_independence_gap, welfare_gap_at_reference,
-      lemma_lizzeri_bundled_rent
-        (integrated-seller-certifier rent — extension of
-        Lizzeri 1999 to integrated case),
+      case_1_different_isoclines_implies_BR_invariant
+        (paper §4.3 Case 1 contradiction atomic; v0.3 §3.4.6
+        extracted from former `bestResponseUniqueAtTheta-
+        InvariantWelfare` atomic),
+      bundled_extension_via_independence
+        (integrated-seller-certifier extension via
+        `lem:independence`; v0.3 §3.4.6 extracted from
+        former `lemma_lizzeri_bundled_rent` atomic),
+      channels_exhaust_under_HA7
+        (paper Appendix A.2 channel-exhaustion under HA-7;
+        v0.3 §3.4.6 extracted from former
+        `gini_two_channel_partition` atomic),
       mBertrand_one_le_bundled
         (saturated-Bertrand-vs-bundled rent bound),
       capital_share_channel_contribution
         (Acemoglu-Restrepo × Korinek-Vipra composition),
       verification_rent_channel_contribution
         (Lizzeri-extension × Bertrand × κ_2 composition),
-      gini_two_channel_partition (paper-novel HA-7),
       lerman_yitzhaki_comonotonicity_translation
         (Lerman-Yitzhaki 1985 × GE_0-bound × first-order
         factor-share linearisation composition),
@@ -1331,36 +1648,117 @@ def cat3SubTypeCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
       eta_attenuation_at_zero,
       eta_attenuation_unit_interval
 
-  Cat 3 sub-types not used in this project:
-  `hypothesisPredicate` (paper's scope conditions (SC1)–(SC6),
-  (HA-1)–(HA-9), regime structures, and decoupling predicates
-  are all concrete `def`s in `Basic.lean`, not axiomatized
-  predicates), `workingAssumption` (every axiom in this
-  formalisation is a definitional atom — carrier or paper-
-  stated structural equation — not a temporarily-axiomatized
-  higher-level claim with a close target), `conditionalHypothesis`
-  (paper conclusions are not conditional on external open
-  problems like RH/BSD/Hodge/P≠NP).
+    Derived theorems closing the v0.3 §3.4.6 decompositions
+    (gapClosed; not Cat 1/2/3 inputs):
+      bestResponseUniqueAtThetaInvariantWelfare
+        (composes OnSameIsocline + mwg_cost_min_uniqueness_-
+        isocline + case_1_different_isoclines_implies_BR_-
+        invariant via classical case-split),
+      lemma_lizzeri_bundled_rent
+        (composes lizzeri_1999_separate_certifier_rent +
+        bundled_extension_via_independence),
+      gini_two_channel_partition
+        (composes HA7_channels_not_anti_correlated +
+        channels_exhaust_under_HA7)
+
+  Cat 3 sub-types not used in this project: `workingAssumption`
+  (every axiom in this formalisation is a definitional atom —
+  carrier, hypothesis predicate, or paper-stated structural
+  equation — not a temporarily-axiomatized higher-level claim
+  with a close target), `conditionalHypothesis` (paper
+  conclusions are not conditional on external open problems
+  like RH/BSD/Hodge/P≠NP).
+
+  v0.3 §3.4.6 reductionism round (v6 mandatory ≥2-round
+  hostile reductionism per Cat 3) outcomes:
+
+    Target 1 — `bestResponseUniqueAtThetaInvariantWelfare`:
+      Round 1 Cat 1? CLEAR-NO (no Mathlib welfare/cost-min
+        apparatus at this abstraction).
+      Round 2 Cat 2? PARTIAL — MWG Prop 5.C.2(v) is the
+        textbook fact applied in Case 2; extracted as
+        separate Cat 2 atomic (`mwg_cost_min_uniqueness_-
+        isocline`).  Case 1 contradiction is paper-novel.
+      Decomposition: 1 Cat 3 atomic →
+        + Cat 3 hypothesisPredicate (OnSameIsocline)
+        + Cat 2 atomic (mwg_cost_min_uniqueness_isocline)
+        + Cat 3 structural (case_1_different_isoclines_-
+          implies_BR_invariant)
+        + derived theorem (bestResponseUniqueAtTheta-
+          InvariantWelfare).
+      Net effect: Cat 3 +1, Cat 2 +1.
+
+    Target 2 — `lemma_lizzeri_bundled_rent`:
+      Round 1 Cat 1? CLEAR-NO (no Mathlib credence-good IO
+        apparatus).
+      Round 2 Cat 2? PARTIAL — Lizzeri 1999 Prop 1 (separate
+        intermediary) is the textbook base; extracted as
+        separate Cat 2 atomic.  Bundled extension via
+        `lem:independence` is paper-novel (Remark
+        `\\label{rem:lizzeri_extension}`).
+      Decomposition: 1 Cat 3 atomic →
+        + Cat 2 atomic (lizzeri_1999_separate_certifier_rent)
+        + Cat 3 structural (bundled_extension_via_independence)
+        + derived theorem (lemma_lizzeri_bundled_rent).
+      Net effect: Cat 3 +0, Cat 2 +1.
+
+    Target 3 — `gini_two_channel_partition`:
+      Round 1 Cat 1? CLEAR-NO (no Mathlib factor-source
+        decomposition for GE_0 at this abstraction).
+      Round 2 Cat 2? CLEAR-NO — HA-7 is paper-specific
+        working assumption; Shorrocks 1982 (Cat 2 atomic)
+        gives additive decomposability of GE_0 along ANY
+        factor-source partition, but the paper's claim that
+        capital-share + verification-rent specifically
+        EXHAUST the decomposition under HA-7 is paper-novel.
+      Decomposition: 1 Cat 3 atomic →
+        + Cat 3 hypothesisPredicate (HA7_channels_not_anti_-
+          correlated)
+        + Cat 3 structural (channels_exhaust_under_HA7)
+        + derived theorem (gini_two_channel_partition).
+      Net effect: Cat 3 +1, Cat 2 +0.
 
   Cat 3 / Cat 2+Cat 3 ratio (v6 §3.4.6 reductionism guard):
-  22 Cat 3 / (7 Cat 2 + 22 Cat 3) = 22 / 29 ≈ 75.9% (> 50%
-  threshold).  Driver: the paper's three independent
+  24 Cat 3 / (9 Cat 2 + 24 Cat 3) = 24 / 33 ≈ 72.7% (> 50%
+  threshold; improved from v0.2.0's 75.9%).  The threshold
+  reductionism round has executed once and reduced the ratio
+  by 3.2 percentage points by extracting two external textbook
+  facts (MWG Prop 5.C.2(v) cost-min uniqueness on isoclines;
+  Lizzeri 1999 Prop 1 separate-certifier rent) as proper Cat 2
+  atomic axioms while preserving paper-fidelity by retaining
+  the paper-novel Case 1 / integrated-extension / HA-7 +
+  channel-exhaustion content as smaller Cat 3 atomics.
+
+  Driver of remaining >50%: the paper's three independent
   theorem clusters (characterization, gini bound, antitipping,
   t4 binding, longrun) each contribute several paper-stated
   atomic structural equations on paper-introduced primitives
-  (κ_1, κ_2, s_K, η, m_Bertrand).  The Cat 2 column captures
-  only welfare-economics-101 + factor-share positivity +
-  Bertrand rent monotonicity / non-negativity + Shorrocks 1982
-  additive decomposability.  Each Cat 3 entry has been through
-  ≥2 reductionism check rounds (Cat 1? Cat 2?) per the
-  `attackHistory` field; the ≥50% over-threshold reflects the
-  paper's genuine novelty over standard welfare economics, not
-  reaching-for-axiom-too-fast.  Future rounds may further
-  decompose composite Cat 3 entries (`bestResponseUniqueAt-
-  ThetaInvariantWelfare`, `lemma_lizzeri_bundled_rent`,
-  `gini_two_channel_partition`) into smaller (Cat 2 + Cat 3)
-  pairs once isocline / welfare-via-quality / integrated-rent
-  apparatus is built out.
+  (κ_1, κ_2, s_K, η, m_Bertrand) + paper-introduced regime/
+  scope predicates (OnSameIsocline, HA-7).  Every remaining
+  Cat 3 entry has been through ≥2 reductionism check rounds
+  (Cat 1? Cat 2?) per the `attackHistory` field; the >50%
+  over-threshold reflects the paper's genuine novelty over
+  standard welfare economics, not reaching-for-axiom-too-fast.
+
+  Remaining decomposition candidates (for future v0.4+ rounds
+  if abstraction layer is enriched):
+
+    * Cat 3 `lerman_yitzhaki_comonotonicity_translation`:
+      could decompose into Cat 2 atomic for Lerman-Yitzhaki
+      1985 Gini decomposition formula + Cat 3 atomic for the
+      first-order factor-share linearisation step.  Deferred:
+      requires building Lerman-Yitzhaki rank-correlation
+      apparatus at our abstraction layer.
+    * Cat 3 `capital_share_channel_contribution` /
+      `verification_rent_channel_contribution`: each could
+      decompose into a Cat 2 base (Acemoglu-Restrepo CES
+      envelope + Tirole Bertrand rent) + Cat 3 paper-novel
+      compositional step.  Deferred: requires CES production-
+      function apparatus.
+    * Cat 3 `mBertrand_one_le_bundled`: could decompose into
+      Cat 2 Tirole Bertrand-saturation rent + Cat 3 paper-
+      novel integrated-vs-saturated comparison.  Deferred:
+      requires Tirole Bertrand-with-fixed-cost apparatus.
 
   Lean kernel (Cat 0; not declared here): propext,
   Classical.choice, Quot.sound.
