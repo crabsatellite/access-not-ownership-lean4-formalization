@@ -112,31 +112,38 @@ axiom lemma_independence_gap :
 
 /-! ### Cat 2 atomic external textbook axioms -/
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
     **Lemma~\ref{lem:lizzeri}: integrated seller-certifier
-    rent.**
+    rent (extension of Lizzeri 1999).**
 
-    Paper §6.2: under Assumptions~\ref{ass:credence}–
-    ~\ref{ass:reputation} and Lemma~\ref{lem:independence},
-    when the certifier is also the seller (bundled regime,
-    `v = 1`), the optimal information-disclosure strategy
-    reveals the minimum information that supports purchase.
-    The integrated certifier extracts a rent `m > 0` that
-    does NOT vanish as `(ω, π) → (1, 1)`.
+    Paper `\label{lem:lizzeri}` + Remark
+    `\label{rem:lizzeri_extension}`: under Assumptions
+    `\label{ass:credence}`–`\label{ass:reputation}` and
+    Lemma `\label{lem:independence}`, when the certifier is
+    also the seller (bundled regime, `v = 1`), the optimal
+    information-disclosure strategy reveals the minimum
+    information that supports purchase.  The integrated
+    certifier extracts a rent `m > 0` that does NOT vanish
+    as `(ω, π) → (1, 1)`.
 
-    Citation: Lizzeri, Alessandro, "Information Revelation
-    and Certification Intermediaries," *RAND Journal of
-    Economics* 30(2), 1999, pp. 214–231, Proposition 1
-    (monopoly seller-certifier extracts full rent via
-    minimum-disclosure strategy); paper §6.2 Remark
-    `\label{rem:lizzeri_extension}` for the bundled-seller-
-    certifier extension via Lemma~\ref{lem:independence}.
+    Citation discipline.  The atomic axiom is Cat 3
+    (paper-novel) — NOT a direct citation of Lizzeri 1999.
+    Per Remark `\label{rem:lizzeri_extension}`: "Lizzeri
+    (1999) treats an independent monopolist certifier
+    facing a separate seller; the integrated case requires
+    Lemma~\ref{lem:independence} to rule out the
+    alternative micro-foundation...".  The Lizzeri 1999
+    Proposition 1 result (monopoly certifier extracts
+    surplus via min-disclosure on the separate-seller-
+    and-intermediary configuration) is the external prior
+    art; the integrated-seller-certifier extension is
+    paper-novel.
 
     Scope:
     Atomic existence: there is a positive constant
     `m_bundled > 0` representing the bundled-regime rent
-    that survives the boundary `(ω, π) = (1, 1)`. -/
+    in the integrated-seller-certifier configuration. -/
 axiom lemma_lizzeri_bundled_rent :
     ∃ m_bundled : ℝ, 0 < m_bundled
 
@@ -160,15 +167,17 @@ axiom mBertrand : ℝ → ℝ
 
     **Non-negativity of `m_Bertrand`.**
 
-    Paper §6.3 Lemma~\ref{lem:bertrand}: `m_Bertrand(ν) :=
-    c_R / K(ν)` is the ratio of a positive credibility-
-    maintenance cost over a positive certifier count, hence
-    non-negative.
+    Paper `\label{lem:bertrand}`: `m_Bertrand(ν) := c_R /
+    K(ν)` is the ratio of a positive credibility-maintenance
+    cost over a positive certifier count, hence non-negative.
 
-    Citation: Fauré-Grimaud, Peyrache, "The Collapse of a
-    Rating Industry under Competition," 2009, Lemma 1
-    (Bertrand-equilibrium fee characterisation among `K ≥ 2`
-    competing certifiers).
+    Citation: Tirole, Jean, *The Theory of Industrial
+    Organization*, MIT Press 1988, Chapter 5 (Bertrand price
+    competition with `K ≥ 2` symmetric firms collapses to
+    marginal-cost pricing at the symmetric equilibrium); the
+    `c_R / K(ν)` fee characterisation is the canonical
+    Bertrand-equilibrium-with-fixed-cost-`c_R`-amortised-
+    across-`K`-certifiers form.
 
     Scope:
     Atomic non-negativity `0 ≤ mBertrand ν` for all `ν`. -/
@@ -178,15 +187,18 @@ axiom mBertrand_nonneg : ∀ ν : ℝ, 0 ≤ mBertrand ν
 
     **Monotonicity of `m_Bertrand`.**
 
-    Paper §6.3 Lemma~\ref{lem:bertrand}: "The integrated-
-    provider rent collapses to `c_R / K(ν)`, which is
-    decreasing in `ν`."  The increasing `K(ν)` (count of
-    independent certifiers) divides a fixed numerator `c_R`,
-    so `m_Bertrand` is monotone non-increasing in `ν` on
+    Paper `\label{lem:bertrand}`: "The integrated-provider
+    rent collapses to `c_R / K(ν)`, which is decreasing in
+    `ν`."  The increasing `K(ν)` (count of independent
+    certifiers) divides a fixed numerator `c_R`, so
+    `m_Bertrand` is monotone non-increasing in `ν` on
     `[0, 1]`.
 
-    Citation: Fauré-Grimaud, Peyrache (2009) Lemma 1
-    monotonicity corollary.
+    Citation: Tirole, *The Theory of Industrial
+    Organization*, MIT Press 1988, Ch. 5 §5.7 (entry under
+    fixed cost; the per-certifier rent at the symmetric
+    Bertrand equilibrium scales inversely in the number of
+    competitors).
 
     Scope:
     Atomic monotonicity `ν₁ ≤ ν₂ ⇒ mBertrand ν₂ ≤ mBertrand ν₁`
@@ -195,21 +207,27 @@ axiom mBertrand_monotone :
     ∀ ν₁ ν₂ : ℝ, 0 ≤ ν₁ → ν₁ ≤ ν₂ → ν₂ ≤ 1 →
       mBertrand ν₂ ≤ mBertrand ν₁
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
-    **`m_Bertrand` bounded by bundled rent at saturation.**
+    **`m_Bertrand(1) ≤ m_bundled`** (rent dominance of the
+    bundled regime over the saturated unbundled regime).
 
-    Paper §6.3 Lemma~\ref{lem:bertrand}: "approaches
-    `c_R / K_max` as `ν → 1`.  The limit is strictly zero
-    only in the institutional saturation limit `K_max → ∞`;
-    for finite `K_max` the residual rent `c_R / K_max` is the
-    asymptotic floor under the eval-licensing regime."  Thus
-    `m_Bertrand(1) ≤ m_bundled` where `m_bundled` is the
-    bundled-regime Lizzeri rent.
+    Paper `\label{lem:bertrand}`: "approaches `c_R / K_max`
+    as `ν → 1`.  The limit is strictly zero only in the
+    institutional saturation limit `K_max → ∞`; for finite
+    `K_max` the residual rent `c_R / K_max` is the asymptotic
+    floor under the eval-licensing regime."
 
-    Citation: Fauré-Grimaud, Peyrache (2009) §4 (asymptotic
-    behaviour); contrasted with Lizzeri (1999) Proposition 1
-    bundled rent.
+    Citation discipline.  This is Cat 3 (paper-novel) — NOT
+    a direct citation of an external textbook.  The
+    inequality `mBertrand 1 ≤ m_bundled` is the paper's
+    comparison of the saturated-Bertrand rent ceiling with
+    the integrated-seller-certifier rent (Lemma
+    `\label{lem:lizzeri}`).  The textbook ingredients
+    (Tirole 1988 Ch. 5 for Bertrand, Lizzeri 1999 Prop 1
+    for the separate-intermediary case) do not directly
+    establish the inequality on the bundled-vs-unbundled
+    seller-certifier configuration of this paper.
 
     Scope:
     Atomic bound on the rent function at the saturation

@@ -40,23 +40,24 @@
   AccessOrthogonality/Ledger.lean`):
 
     Cat 2 propositional axioms (Mas-Colell-Whinston-Green +
-    Acemoglu-Restrepo + Lizzeri + Fauré-Grimaud-Peyrache +
-    Strausz + Shorrocks + Lerman-Yitzhaki + Darby-Karni +
-    Klein-Leffler):
+    Acemoglu-Restrepo + Lizzeri + Shorrocks + Lerman-Yitzhaki +
+    Darby-Karni + Klein-Leffler + Tirole):
       bestResponseUniqueAtThetaInvariantWelfare,
       kappa1_pos, kappa2_pos, sK_nonneg,
       capital_share_channel_contribution,
       verification_rent_channel_contribution,
       shorrocks_additive_decomposition,
       lerman_yitzhaki_comonotonicity_translation,
-      lemma_lizzeri_bundled_rent,
-      mBertrand_nonneg, mBertrand_monotone,
-      mBertrand_one_le_bundled
+      mBertrand_nonneg, mBertrand_monotone
 
     Cat 3 propositional structural equations (Li 2026):
       welfareFactorsThroughAllocation,
       SC1_implements_Malpha, SC3_implements_Mbeta,
       lemma_independence_gap, welfare_gap_at_reference,
+      lemma_lizzeri_bundled_rent (integrated-seller-certifier
+        rent — extension of Lizzeri 1999 to integrated case),
+      mBertrand_one_le_bundled (saturated-Bertrand-vs-bundled
+        rent comparison; paper-novel composition),
       long_run_step1_profit_zero,
       long_run_step4_zero_lobbying,
       long_run_step5_mStar_invariance,

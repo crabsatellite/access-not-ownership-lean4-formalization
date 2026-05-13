@@ -465,15 +465,24 @@ def gap_lerman_yitzhaki_comonotonicity_translation : GapEntry := {
 def gap_lemma_lizzeri_bundled_rent : GapEntry := {
   name := "lemma_lizzeri_bundled_rent"
   status := GapStatus.gapOpen
-  inputCategory := InputCategory.cat2External
+  inputCategory := InputCategory.cat3PaperNovel
   paperSource :=
-    "Lizzeri, Alessandro, \"Information Revelation and " ++
-    "Certification Intermediaries,\" *RAND Journal of " ++
-    "Economics* 30(2), 1999, pp. 214–231, Proposition 1 " ++
-    "(monopoly seller-certifier extracts full rent via " ++
-    "minimum-disclosure strategy)."
-  attackHistory := []
-  scope := "∃ m_bundled : ℝ, 0 < m_bundled."
+    "Li 2026, `\\label{lem:lizzeri}` + Remark " ++
+    "`\\label{rem:lizzeri_extension}`: integrated " ++
+    "seller-certifier rent, extension of Lizzeri (1999) " ++
+    "*RAND J. Econ.* 30(2):214–231 (which treats an " ++
+    "INDEPENDENT monopoly certifier facing a SEPARATE " ++
+    "seller) to the bundled-seller-certifier configuration " ++
+    "via Lemma~\\ref{lem:independence}."
+  attackHistory := [
+    "v0.2 (audit R2): re-categorised Cat 2 → Cat 3 after " ++
+      "verifying Lizzeri 1999 abstract treats SEPARATE " ++
+      "intermediary, not integrated seller-certifier. " ++
+      "The integrated-case rent claim is paper-novel " ++
+      "(Remark `\\label{rem:lizzeri_extension}` confirms " ++
+      "this explicitly)."
+  ]
+  scope := "∃ m_bundled : ℝ, 0 < m_bundled (integrated seller-certifier configuration)."
 }
 
 /-- (Binding) Lemma~\ref{lem:bertrand} — `mBertrand` carrier. -/
@@ -497,11 +506,23 @@ def gap_mBertrand_nonneg : GapEntry := {
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
   paperSource :=
-    "Fauré-Grimaud, Peyrache, \"The Collapse of a Rating " ++
-    "Industry under Competition,\" 2009, Lemma 1 " ++
-    "(Bertrand-equilibrium fee characterisation among K ≥ 2 " ++
-    "competing certifiers)."
-  attackHistory := []
+    "Tirole, Jean, *The Theory of Industrial Organization*, " ++
+    "MIT Press 1988, Chapter 5 (Bertrand price competition " ++
+    "with K ≥ 2 symmetric firms; the per-certifier rent " ++
+    "c_R / K(ν) at the symmetric equilibrium is non-negative " ++
+    "by construction)."
+  attackHistory := [
+    "v0.2 (audit R2): citation re-anchored from " ++
+      "fabricated 'Fauré-Grimaud, Peyrache 2009 The " ++
+      "Collapse of a Rating Industry under Competition' " ++
+      "(verified non-existent; the actual 2009 RAND " ++
+      "paper is Faure-Grimaud-Peyrache-Quesada, \"The " ++
+      "Ownership of Ratings,\" RAND 40(2):234–257, which " ++
+      "argues competition REDUCES information — the " ++
+      "opposite direction of the Bertrand-collapse claim) " ++
+      "to Tirole 1988 Ch. 5 (canonical Bertrand-with-K-firms " ++
+      "textbook reference)."
+  ]
   scope :=
     "0 ≤ mBertrand ν for all ν.  Atomic non-negativity."
 }
@@ -512,9 +533,15 @@ def gap_mBertrand_monotone : GapEntry := {
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
   paperSource :=
-    "Fauré-Grimaud, Peyrache (2009) Lemma 1 monotonicity " ++
-    "corollary: the rent c_R / K(ν) is decreasing in ν."
-  attackHistory := []
+    "Tirole 1988, *Theory of Industrial Organization*, MIT " ++
+    "Press, Ch. 5 §5.7 (entry under fixed cost; per-firm " ++
+    "rent at the symmetric Bertrand equilibrium scales " ++
+    "inversely in the number of competitors)."
+  attackHistory := [
+    "v0.2 (audit R2): citation re-anchored from fabricated " ++
+      "Fauré-Grimaud-Peyrache 2009 \"Collapse\" reference " ++
+      "to Tirole 1988 Ch. 5 §5.7 (textbook Bertrand-with-K-firms)."
+  ]
   scope :=
     "ν₁ ≤ ν₂ on [0,1] ⇒ mBertrand ν₂ ≤ mBertrand ν₁.  " ++
     "Atomic monotonicity."
@@ -524,12 +551,22 @@ def gap_mBertrand_monotone : GapEntry := {
 def gap_mBertrand_one_le_bundled : GapEntry := {
   name := "mBertrand_one_le_bundled"
   status := GapStatus.gapOpen
-  inputCategory := InputCategory.cat2External
+  inputCategory := InputCategory.cat3PaperNovel
   paperSource :=
-    "Fauré-Grimaud, Peyrache (2009) §4 (asymptotic " ++
-    "behaviour); contrasted with Lizzeri (1999) Proposition " ++
-    "1 bundled rent."
-  attackHistory := []
+    "Li 2026, `\\label{lem:bertrand}` saturation-vs-bundled " ++
+    "comparison: paper-novel claim that the saturated-Bertrand " ++
+    "rent ceiling `mBertrand 1 = c_R/K_max` is dominated by " ++
+    "the integrated-seller-certifier rent `m_bundled` of " ++
+    "Lemma `\\label{lem:lizzeri}`.  The textbook ingredients " ++
+    "(Tirole 1988 Ch. 5 Bertrand, Lizzeri 1999 Prop 1 " ++
+    "separate-intermediary case) do not directly establish " ++
+    "the inequality on the integrated-configuration."
+  attackHistory := [
+    "v0.2 (audit R2): re-categorised Cat 2 → Cat 3.  " ++
+      "Textbook references (Tirole 1988, Lizzeri 1999) " ++
+      "supply ingredients but do not directly bound the " ++
+      "integrated-vs-saturated rent comparison."
+  ]
   scope :=
     "mBertrand 1 ≤ m_bundled for any positive bundled-rent. " ++
     "Atomic bound at the saturation point."
