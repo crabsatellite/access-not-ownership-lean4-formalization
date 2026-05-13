@@ -60,18 +60,39 @@ namespace AccessOrthogonality
 
 /-! ### Cat 3 paper-stated structural equations -/
 
-/-- *Cat 3 paper-novel atomic structural equation.*
+/-- *Cat 2 atomic external textbook axiom.*
 
     **Welfare-factors-through-allocation.**
 
-    Paper §4.1 (proof of Theorem~\ref{thm:characterization},
-    ⇐ direction): "Consumer surplus, profits, and transfers
-    all depend on the equilibrium allocation but not directly
-    on `θ_i` (the welfare functional `W` is `θ`-blind)."
+    Paper proof of Theorem `\label{thm:characterization}`
+    (⇐ direction): "Consumer surplus, profits, and
+    transfers all depend on the equilibrium allocation but
+    not directly on `θ_i` (the welfare functional `W` is
+    `θ`-blind)."
 
-    Stated as an atomic equation: there exists a function
-    `wOfAlloc : Investment → AccessVector → Regime → ℝ` such
-    that for any θ, `W^*(θ, bmu, R) = wOfAlloc (br.alloc θ R) bmu R`.
+    Citation: standard welfare-economics decomposition.
+    Mas-Colell, Whinston, Green, *Microeconomic Theory*,
+    Oxford University Press 1995, §10.D (welfare analysis
+    in partial-equilibrium) + §16.F (welfare theorems in
+    general equilibrium): the welfare functional
+    `W = CS + ∑Π - T` is a primitive of the allocation
+    (consumer surplus and producer surplus integrate
+    against equilibrium quantities; lump-sum transfers are
+    θ-blind under (SC5)).  Paper §4.6 "Tautology critique"
+    acknowledges this is welfare-economics-101: "the
+    welfare functional `W` is `θ`-blind once one accepts
+    the standard `W = CS + ∑Π - T` decomposition."
+
+    Discipline note (audit R4).  This was previously
+    classified Cat 3 (paper-novel).  Paper §4.6 explicitly
+    states the factorisation IS welfare-economics-101, not
+    a paper-novel structural claim.  Re-categorised Cat 3
+    → Cat 2 to match paper self-assessment.  Substantive
+    contribution of T1 lives in (a) the Cobb-Douglas
+    isocline cost-min uniqueness step (Cat 2
+    `bestResponseUniqueAtThetaInvariantWelfare`) and (b)
+    the four-mechanism enumeration of
+    Proposition `\label{prop:four_mechanisms}`.
 
     Scope:
     Carrier of the *factorisation* of `W^*` through the

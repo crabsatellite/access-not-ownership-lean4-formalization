@@ -72,14 +72,24 @@ structure GapEntry where
 def gap_welfareFactorsThroughAllocation : GapEntry := {
   name := "welfareFactorsThroughAllocation"
   status := GapStatus.gapOpen
-  inputCategory := InputCategory.cat3PaperNovel
+  inputCategory := InputCategory.cat2External
   paperSource :=
-    "Li 2026, `\\label{thm:characterization}` proof " ++
-    "(⇐ direction): \"Consumer surplus, profits, and " ++
-    "transfers all depend on the equilibrium allocation but " ++
-    "not directly on θ_i (the welfare functional W is " ++
-    "θ-blind).\""
-  attackHistory := []
+    "Mas-Colell, Whinston, Green, *Microeconomic Theory*, " ++
+    "Oxford University Press 1995, §10.D (partial-" ++
+    "equilibrium welfare) + §16.F (general-equilibrium " ++
+    "welfare theorems): `W = CS + ∑Π - T` is a primitive " ++
+    "of the equilibrium allocation; lump-sum transfers " ++
+    "are θ-blind under (SC5).  Paper §4.6 \"Tautology " ++
+    "critique\" explicitly acknowledges this is welfare-" ++
+    "economics-101."
+  attackHistory := [
+    "v0.2 (audit R4): re-categorised Cat 3 → Cat 2.  " ++
+      "Paper §4.6 explicitly states the factorisation IS " ++
+      "welfare-economics-101, not paper-novel structural " ++
+      "content.  Substantive contribution of T1 lives in " ++
+      "the MWG Prop 5.C.2 cost-min step + four-mechanism " ++
+      "enumeration, not in the factorisation."
+  ]
   scope :=
     "Existence of `wOfAlloc : Investment → AccessVector → " ++
     "Regime → ℝ` factorising `W^*` through the best-response " ++

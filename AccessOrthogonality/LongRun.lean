@@ -227,17 +227,17 @@ axiom long_run_step5_bmuStar_invariance :
     is identically zero under (M_α)+(M_β).  By
     `long_run_step4_zero_lobbying`, the capture-game
     equilibrium has zero lobbying effort.  Finally, by
-    `thm_separation_welfare_invariant` (Corollary
-    ~\ref{thm:separation} + Theorem~\ref{thm:characterization}),
-    `W^*` is θ-invariant on the OI regime.  The two long-run
-    steps are recorded in the proof body for completeness
-    even though the final welfare-θ-invariance flows through
-    the static composition. -/
+    `prop_four_mechanisms_Mbeta` we get ownership-invariance
+    from (M_β) directly, and `thm_characterization_suff`
+    converts ownership-invariance to welfare-θ-invariance.
+    This is paper §7.3 Step 5 verbatim, and crucially
+    does NOT require the full (SC1)-(SC6) ScopeConditions —
+    only the joint (M_α)+(M_β) hypothesis the paper
+    actually invokes. -/
 theorem thm_longrun
     (W : WelfareFunctional)
     (P : ProfitFunctional) (br : BestResponseMap)
-    (R : Regime) (a : AccessVector) (w_d : ℝ)
-    (sc : ScopeConditions R a w_d)
+    (R : Regime) (a : AccessVector)
     (hMa : MechanismMalpha P R)
     (hMb : MechanismMbeta br R) :
     WelfareThetaInvariant W a R := by
@@ -255,10 +255,17 @@ theorem thm_longrun
       (i : Fin game.nProviders), (game.efforts i).val = 0 :=
     long_run_step4_zero_lobbying P br R hMa hMb
   -- Step 5: by the static characterization
-  --   (Theorem~\ref{thm:characterization} via the
-  --   constructive corollary), W^* is θ-invariant on the
-  --   OI regime.  This is paper §7.3 Step 5 verbatim.
-  exact thm_separation_welfare_invariant W P br R a w_d sc
+  --   (Theorem~\ref{thm:characterization}), W^* is
+  --   θ-invariant on the OI regime.  We compose
+  --   prop_four_mechanisms_Mbeta (Mβ ⇒ ownership-invariant)
+  --   with thm_characterization_suff
+  --   (ownership-invariant ⇒ welfare-θ-invariant).  This
+  --   does not require the full ScopeConditions; only
+  --   (M_α)+(M_β) as the paper Theorem~\ref{thm:longrun}
+  --   states.
+  have hOI : OwnershipInvariant br R :=
+    prop_four_mechanisms_Mbeta br R hMb
+  exact thm_characterization_suff W br a R hOI
 
 /-- **Theorem~\ref{thm:longrun}, equilibrium-policy
     θ-invariance.**
@@ -298,20 +305,24 @@ theorem thm_longrun_policy_invariance
 
     Proof.  At the binding un-captured regulator `R_{k^*}`,
     apply Theorem~\ref{thm:longrun} (`thm_longrun`).  The
-    multi-agency reduction axiom is not needed beyond
-    asserting the binding-constraint structure (paper §7.4
-    sketch); the conclusion follows from the single-
-    regulator long-run theorem at `R_{k^*}`. -/
+    paper's intersection-as-binding-constraint formalism
+    `∩_k R_k` is structurally captured by the fact that the
+    single-regulator long-run theorem at `R_{k^*}` suffices
+    for the conclusion (Lean encoding does not encode the
+    multi-agency arithmetic; the substantive content the
+    Lean side captures is that the conclusion of paper
+    Proposition `\label{prop:multi_agency}` reduces to the
+    single-regulator long-run theorem at the binding
+    regulator). -/
 theorem prop_multi_agency
     (W : WelfareFunctional) (P : ProfitFunctional)
     (br : BestResponseMap) (R_kstar : Regime)
-    (a : AccessVector) (w_d : ℝ)
-    (sc : ScopeConditions R_kstar a w_d)
+    (a : AccessVector)
     (hMa : MechanismMalpha P R_kstar)
     (hMb : MechanismMbeta br R_kstar) :
     WelfareThetaInvariant W a R_kstar := by
   -- The binding un-captured regulator `R_{k^*}` satisfies
   -- the single-regulator long-run theorem.
-  exact thm_longrun W P br R_kstar a w_d sc hMa hMb
+  exact thm_longrun W P br R_kstar a hMa hMb
 
 end AccessOrthogonality
