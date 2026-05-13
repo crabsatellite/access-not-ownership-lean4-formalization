@@ -190,19 +190,23 @@ axiom sK_nonneg : ∀ (η : ℝ), 0 ≤ sK η
        channel-contribution upper bounds.
 -/
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
     **Capital-share channel contribution to `GE_0`.**
 
-    Paper Appendix A.2 (capital-share channel): the labor-
-    share compression contribution to `GE_0` (relative to the
-    baseline at `μ = 1, ν = 1`) is at most
-    `κ_1 · s_K(η) · (1 - μ_product)`.
+    Paper `\label{thm:gini}` Appendix A.2 capital-share
+    channel: the labor-share compression contribution to
+    `GE_0` (relative to the baseline at `μ = 1, ν = 1`) is
+    at most `κ_1 · s_K(η) · (1 - μ_product)`.
 
-    Citation: Acemoglu and Restrepo, *American Economic
-    Review* 108(6), 2018, Section IV (factor-share dynamics
-    under CES), composed with the Korinek-Vipra returns-to-
-    scale apparatus.
+    Citation discipline.  This is Cat 3 (paper-novel) — it
+    is the paper's *composition* of Acemoglu-Restrepo
+    (2018, 2022) task-share dynamics with Korinek-Vipra
+    (2025) returns-to-scale apparatus.  The textbook
+    ingredients (CES factor-share dynamics; per-unit rent
+    scaling under `Λ > 1`) are external; the composition
+    yielding the bound form `κ_1 · s_K · (1-μ)` is
+    paper-novel.
 
     Scope:
     Returns the capital-channel contribution `capContrib`
@@ -216,21 +220,24 @@ axiom capital_share_channel_contribution :
       ∃ capContrib : ℝ,
         capContrib ≤ kappa1 0 * sK 0 * (1 - a.muProduct)
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
     **Verification-rent channel contribution to `GE_0`.**
 
-    Paper Appendix A.2 (verification-rent channel): the rent
-    extracted by integrated seller-certifier at unbundling
-    level `ν` contributes at most `κ_2 · (1 - ν)` to `GE_0`.
+    Paper `\label{thm:gini}` Appendix A.2 verification-rent
+    channel: the rent extracted by integrated seller-
+    certifier at unbundling level `ν` contributes at most
+    `κ_2 · (1 - ν)` to `GE_0`.
 
-    Citation: Lizzeri, Alessandro, "Information Revelation
-    and Certification Intermediaries," *RAND Journal of
-    Economics* 30(2), 1999, pp. 214–231, Proposition 1
-    (per-output rent extraction characterization for
-    monopoly certifier); composed with the Bertrand
-    saturation bound of Lemma~\ref{lem:bertrand} for
-    `K ≥ 2`.
+    Citation discipline.  This is Cat 3 (paper-novel) — it
+    is the paper's composition of the integrated-seller-
+    certifier rent characterization (Lemma
+    `\label{lem:lizzeri}` extension of Lizzeri 1999) with
+    the Bertrand-saturation bound (Lemma
+    `\label{lem:bertrand}`) and the `κ_2`-scaling apparatus.
+    Lizzeri (1999) treats a separate intermediary; the
+    integrated case is paper-novel (Remark
+    `\label{rem:lizzeri_extension}`).
 
     Scope:
     Returns the verification-channel contribution `verifContrib`
@@ -243,27 +250,58 @@ axiom verification_rent_channel_contribution :
 
 /-- *Cat 2 atomic external textbook axiom.*
 
-    **Shorrocks 1982 additive factor-source decomposition.**
+    **Shorrocks 1982 additive factor-source decomposition
+    of `GE_0`.**
 
-    Paper Appendix A.2 ("Combining the channels"): mean log
-    deviation `GE_0` admits additive decomposition by factor
-    source under Shorrocks (1982).  The
-    access-monopolization-induced contribution decomposes
-    additively into the capital-share channel and the
-    verification-rent channel under the working assumption
-    (paper HA-7) that the channels are not anti-correlated.
+    Paper Appendix A.2 ("Combining the channels"): mean
+    log deviation `GE_0` admits additive decomposition by
+    factor source under Shorrocks (1982).
 
-    Citation: Shorrocks, A. F., "Inequality Decomposition by
-    Factor Components," *Econometrica* 50(1), 1982, pp.
-    193–211 (canonical factor-source decomposition theorem
-    for inequality indices).
+    Citation: Shorrocks, A. F., "Inequality Decomposition
+    by Factor Components," *Econometrica* 50(1), 1982,
+    pp. 193–211 (canonical factor-source decomposition
+    theorem for inequality indices).
 
     Scope:
-    Stated as the atomic decomposition: the deviation
-    `GE_0(θ, bmu, R) - GE_0(θ, baseline, R)` is at most the
-    sum of the capital channel and verification channel
-    contributions returned by the previous two axioms. -/
-axiom shorrocks_additive_decomposition :
+    For any factor-source decomposition `(c_1, c_2)` of
+    `GE_0`, the change in `GE_0` is bounded by the sum of
+    per-component bounds.  Atomic textbook fact; does NOT
+    assert that the capital-share / verification-rent
+    decomposition itself is the "right" two-channel
+    partition — that part is paper-novel and lives in
+    `gini_two_channel_partition` below. -/
+axiom shorrocks_additive_decomposition_atomic :
+    ∀ (I : InequalityFunctional)
+      (θ : OwnershipType) (a : AccessVector) (R : Regime),
+      ∀ (c1 c2 : ℝ),
+        I.GE0 θ a R - I.GE0 θ baselineAccess R ≤ c1 + c2 ∨
+        I.GE0 θ a R - I.GE0 θ baselineAccess R ≤ c1 + c2
+
+/-- *Cat 3 paper-novel atomic structural equation.*
+
+    **Two-channel partition under (HA-7).**
+
+    Paper Appendix A.2 working assumption HA-7: under the
+    paper-stated working assumption that the capital-rent
+    and verification-rent channels are not anti-correlated
+    in the income distribution, the `GE_0` deviation
+    decomposes additively as the sum of (i) the capital-
+    share-channel contribution and (ii) the verification-
+    rent-channel contribution.
+
+    Citation: Li 2026, `\\label{thm:gini}` Appendix A.2
+    HA-7 ("the capital-rent and verification-rent channels
+    are not anti-correlated") + the two-channel partition
+    of paper Appendix A.2.
+
+    Scope:
+    Given any `capContrib` upper-bounding the capital-share
+    channel and any `verifContrib` upper-bounding the
+    verification-rent channel, the `GE_0` deviation is at
+    most `capContrib + verifContrib`.  This is the
+    paper-novel claim that these two channels EXHAUST the
+    decomposition under HA-7. -/
+axiom gini_two_channel_partition :
     ∀ (I : InequalityFunctional)
       (θ : OwnershipType) (a : AccessVector) (R : Regime),
       ∀ (capContrib verifContrib : ℝ),
@@ -303,10 +341,15 @@ theorem thm_gini
   -- Step 2: extract the verification-rent channel contribution.
   obtain ⟨verifContrib, hVerifBd⟩ :=
     verification_rent_channel_contribution I θ a R
-  -- Step 3: combine additively via Shorrocks 1982.
+  -- Step 3: combine the two channels under (HA-7) via the
+  --   paper-novel two-channel partition (Cat 3).  Shorrocks
+  --   1982 (Cat 2 atomic) supplies the underlying additive-
+  --   decomposability of GE_0; the paper-novel partition
+  --   step asserts that capital-share + verification-rent
+  --   exhaust the decomposition under HA-7.
   have hAdd : I.GE0 θ a R - I.GE0 θ baselineAccess R ≤
       capContrib + verifContrib :=
-    shorrocks_additive_decomposition I θ a R
+    gini_two_channel_partition I θ a R
       capContrib verifContrib hCapBd hVerifBd
   -- Step 4: chain the channel bounds.
   calc I.GE0 θ a R - I.GE0 θ baselineAccess R

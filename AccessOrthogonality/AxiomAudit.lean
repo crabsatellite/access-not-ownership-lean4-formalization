@@ -40,13 +40,10 @@
   AccessOrthogonality/Ledger.lean`):
 
     Cat 2 propositional axioms (Mas-Colell-Whinston-Green +
-    Acemoglu-Restrepo + Lizzeri + Shorrocks + Lerman-Yitzhaki +
-    Darby-Karni + Klein-Leffler + Tirole):
+    Acemoglu-Restrepo + Shorrocks + Lerman-Yitzhaki + Tirole):
       bestResponseUniqueAtThetaInvariantWelfare,
       kappa1_pos, kappa2_pos, sK_nonneg,
-      capital_share_channel_contribution,
-      verification_rent_channel_contribution,
-      shorrocks_additive_decomposition,
+      shorrocks_additive_decomposition_atomic,
       lerman_yitzhaki_comonotonicity_translation,
       mBertrand_nonneg, mBertrand_monotone
 
@@ -58,6 +55,12 @@
         rent — extension of Lizzeri 1999 to integrated case),
       mBertrand_one_le_bundled (saturated-Bertrand-vs-bundled
         rent comparison; paper-novel composition),
+      capital_share_channel_contribution
+        (Acemoglu-Restrepo × Korinek-Vipra composition),
+      verification_rent_channel_contribution
+        (Lizzeri-extension × Bertrand × κ_2 composition),
+      gini_two_channel_partition (paper-novel HA-7 channel
+        exhaustion claim),
       long_run_step1_profit_zero,
       long_run_step4_zero_lobbying,
       long_run_step5_mStar_invariance,

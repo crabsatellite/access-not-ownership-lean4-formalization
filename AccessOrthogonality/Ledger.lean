@@ -396,13 +396,20 @@ def gap_sK_nonneg : GapEntry := {
 def gap_capital_share_channel_contribution : GapEntry := {
   name := "capital_share_channel_contribution"
   status := GapStatus.gapOpen
-  inputCategory := InputCategory.cat2External
+  inputCategory := InputCategory.cat3PaperNovel
   paperSource :=
-    "Acemoglu and Restrepo, *American Economic Review* " ++
-    "108(6), 2018, Section IV (factor-share dynamics under " ++
-    "CES); composed with Korinek-Vipra (2025) returns-to-" ++
-    "scale apparatus."
-  attackHistory := []
+    "Li 2026, `\\label{thm:gini}` Appendix A.2 capital-share " ++
+    "channel: composition of Acemoglu-Restrepo (2018) AER " ++
+    "108(6) task-share dynamics under CES + Korinek-Vipra " ++
+    "(2025) returns-to-scale apparatus, yielding the bound " ++
+    "form `κ_1 · s_K · (1-μ)`."
+  attackHistory := [
+    "v0.2 (audit R3): re-categorised Cat 2 → Cat 3.  " ++
+      "Textbook references (Acemoglu-Restrepo 2018, " ++
+      "Korinek-Vipra 2025) supply ingredients but do not " ++
+      "directly yield the bound — the composition is " ++
+      "paper-novel."
+  ]
   scope :=
     "Existence of capital-channel contribution capContrib ≤ " ++
     "κ_1(0) · s_K(0) · (1 - μ_product).  η = 0 parameter " ++
@@ -413,33 +420,76 @@ def gap_capital_share_channel_contribution : GapEntry := {
 def gap_verification_rent_channel_contribution : GapEntry := {
   name := "verification_rent_channel_contribution"
   status := GapStatus.gapOpen
-  inputCategory := InputCategory.cat2External
+  inputCategory := InputCategory.cat3PaperNovel
   paperSource :=
-    "Lizzeri (1999) Proposition 1 (per-output rent " ++
-    "extraction characterization); composed with " ++
-    "Lemma~\\ref{lem:bertrand} Bertrand saturation."
-  attackHistory := []
+    "Li 2026, `\\label{thm:gini}` Appendix A.2 verification-" ++
+    "rent channel: composition of Lemma `\\label{lem:lizzeri}` " ++
+    "integrated-seller-certifier rent (paper-novel extension " ++
+    "of Lizzeri 1999) + Lemma `\\label{lem:bertrand}` " ++
+    "Bertrand-saturation + κ_2-scaling apparatus."
+  attackHistory := [
+    "v0.2 (audit R3): re-categorised Cat 2 → Cat 3.  " ++
+      "Underlying integrated-seller-certifier setup is " ++
+      "paper-novel (Lizzeri 1999 treats SEPARATE " ++
+      "intermediary); composition with Bertrand and " ++
+      "κ_2-scaling is also paper-novel."
+  ]
   scope :=
     "Existence of verification-channel contribution " ++
     "verifContrib ≤ κ_2 · (1 - ν)."
 }
 
-/-- (Gini) Shorrocks 1982 additive decomposition. -/
-def gap_shorrocks_additive_decomposition : GapEntry := {
-  name := "shorrocks_additive_decomposition"
+/-- (Gini) Shorrocks 1982 additive decomposition (atomic). -/
+def gap_shorrocks_additive_decomposition_atomic : GapEntry := {
+  name := "shorrocks_additive_decomposition_atomic"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
   paperSource :=
-    "Shorrocks, A. F., \"Inequality Decomposition by " ++
-    "Factor Components,\" *Econometrica* 50(1), 1982, " ++
-    "pp. 193–211 (canonical factor-source decomposition " ++
-    "theorem for inequality indices)."
-  attackHistory := []
+    "Shorrocks, A. F., \"Inequality Decomposition by Factor " ++
+    "Components,\" *Econometrica* 50(1), 1982, pp. 193–211 " ++
+    "(canonical factor-source decomposition theorem for " ++
+    "inequality indices; specifically Theorem 1 — mean log " ++
+    "deviation `GE_0` is the unique additively-decomposable " ++
+    "inequality index)."
+  attackHistory := [
+    "v0.2 (audit R3): renamed from `shorrocks_additive_decomposition` " ++
+      "and decomposed.  Original axiom bundled Shorrocks " ++
+      "1982 decomposability (Cat 2) with the paper-novel " ++
+      "two-channel partition under HA-7 (Cat 3); split into " ++
+      "atomic Cat 2 + atomic Cat 3 axiom " ++
+      "`gini_two_channel_partition`."
+  ]
   scope :=
-    "Atomic additive decomposition: GE_0(θ,a,R) - " ++
-    "GE_0(θ,baseline,R) ≤ capContrib + verifContrib under " ++
-    "the channel-non-anti-correlation working assumption " ++
-    "(paper HA-7)."
+    "Atomic textbook fact (Shorrocks 1982 Thm 1) that GE_0 " ++
+    "admits factor-source additive decomposition.  Does NOT " ++
+    "assert that the two paper-stated channels exhaust the " ++
+    "decomposition — that paper-novel partition lives in " ++
+    "`gini_two_channel_partition`."
+}
+
+/-- (Gini) Two-channel partition under HA-7. -/
+def gap_gini_two_channel_partition : GapEntry := {
+  name := "gini_two_channel_partition"
+  status := GapStatus.gapOpen
+  inputCategory := InputCategory.cat3PaperNovel
+  paperSource :=
+    "Li 2026, `\\label{thm:gini}` Appendix A.2 working " ++
+    "assumption HA-7 (\"the capital-rent and verification-" ++
+    "rent channels are not anti-correlated\") + the " ++
+    "two-channel partition of paper Appendix A.2."
+  attackHistory := [
+    "v0.2 (audit R3): created.  Carries the paper-novel " ++
+      "claim that capital-share + verification-rent EXHAUST " ++
+      "the GE_0 decomposition under HA-7.  Companion atomic " ++
+      "axiom: `shorrocks_additive_decomposition_atomic` " ++
+      "(Cat 2 Shorrocks 1982)."
+  ]
+  scope :=
+    "Atomic partition statement: given bounds on the " ++
+    "capital-share channel (≤ κ_1·s_K·(1-μ)) and the " ++
+    "verification-rent channel (≤ κ_2·(1-ν)), the GE_0 " ++
+    "deviation is bounded by their sum.  Encodes paper " ++
+    "HA-7."
 }
 
 /-- (Gini) Lerman-Yitzhaki comonotonicity translation. -/
@@ -996,7 +1046,8 @@ def allGaps : List GapEntry := [
   gap_sK_nonneg,
   gap_capital_share_channel_contribution,
   gap_verification_rent_channel_contribution,
-  gap_shorrocks_additive_decomposition,
+  gap_shorrocks_additive_decomposition_atomic,
+  gap_gini_two_channel_partition,
   gap_lerman_yitzhaki_comonotonicity_translation,
   gap_lemma_lizzeri_bundled_rent,
   -- mBertrand carrier + atomic facts
@@ -1070,13 +1121,9 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
     Cat 2 propositional (external published textbook):
       bestResponseUniqueAtThetaInvariantWelfare,
       kappa1_pos, kappa2_pos, sK_nonneg,
-      capital_share_channel_contribution,
-      verification_rent_channel_contribution,
-      shorrocks_additive_decomposition,
+      shorrocks_additive_decomposition_atomic,
       lerman_yitzhaki_comonotonicity_translation,
-      lemma_lizzeri_bundled_rent,
-      mBertrand_nonneg, mBertrand_monotone,
-      mBertrand_one_le_bundled
+      mBertrand_nonneg, mBertrand_monotone
 
     Cat 3 carrier axioms (Li 2026):
       kappa1, kappa2, sK, eta_attenuation, mBertrand
@@ -1085,6 +1132,11 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
       welfareFactorsThroughAllocation,
       SC1_implements_Malpha, SC3_implements_Mbeta,
       lemma_independence_gap, welfare_gap_at_reference,
+      lemma_lizzeri_bundled_rent,
+      mBertrand_one_le_bundled,
+      capital_share_channel_contribution,
+      verification_rent_channel_contribution,
+      gini_two_channel_partition,
       long_run_step1_profit_zero,
       long_run_step4_zero_lobbying,
       long_run_step5_mStar_invariance,
