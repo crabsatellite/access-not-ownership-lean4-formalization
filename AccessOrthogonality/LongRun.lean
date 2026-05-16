@@ -143,20 +143,18 @@ axiom long_run_step4_zero_lobbying :
       ∀ (game : CaptureGame),
         ∀ (i : Fin game.nProviders), (game.efforts i).val = 0
 
-/-- The equilibrium-of-a-regime relation.  Asserts that a
+/-- *Cat 3 paper-novel atomic hypothesis predicate.*
+
+    The equilibrium-of-a-regime relation.  Asserts that a
     `LongRunEquilibrium` `eq` is the long-run equilibrium of
-    a particular regime `R`.  Carried as a paper-novel
-    typed predicate; it links the abstract
-    `LongRunEquilibrium` carrier to a specific regime so
-    that the Step-5 atomic axioms can be quantified over
-    "the equilibrium of `R`" rather than "any
-    equilibrium". -/
-def IsLongRunEquilibriumOf (eq : LongRunEquilibrium) (R : Regime) : Prop :=
-  -- Paper §7.3 Step 5 ("Equilibrium and orthogonality"):
-  -- `(ℓ^*, m^*) = (0, m^W)` Nash. The Lean side carries
-  -- this as an abstract predicate; the concrete content
-  -- is supplied by the Step-5 atomic axioms below.
-  True
+    a particular regime `R`.  Carried as a paper-novel typed
+    predicate; it links the abstract `LongRunEquilibrium`
+    carrier to a specific regime so that the Step-5 atomic
+    axioms can be quantified over "the equilibrium of `R`"
+    rather than "any equilibrium".  Callers of
+    `thm_longrun_policy_invariance` must supply a genuine
+    `hEqOf : IsLongRunEquilibriumOf eq R` witness. -/
+axiom IsLongRunEquilibriumOf : LongRunEquilibrium → Regime → Prop
 
 /-- *Cat 3 paper-novel atomic structural equation.*
 

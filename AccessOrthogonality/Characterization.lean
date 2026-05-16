@@ -60,7 +60,8 @@ namespace AccessOrthogonality
 
 /-! ### Cat 3 paper-stated structural equations -/
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 2 atomic external textbook axiom (definitional accounting
+    identity).*
 
     **Welfare-factors-through-allocation.**
 
@@ -70,28 +71,24 @@ namespace AccessOrthogonality
     not directly on `θ_i` (the welfare functional `W` is
     `θ`-blind)."
 
-    Citation: standard welfare-economics decomposition.
-    Mas-Colell, Whinston, Green, *Microeconomic Theory*,
-    Oxford University Press 1995, §10.D (welfare analysis
-    in partial-equilibrium) + §16.F (welfare theorems in
-    general equilibrium): the welfare functional
-    `W = CS + ∑Π - T` is a primitive of the allocation
-    (consumer surplus and producer surplus integrate
-    against equilibrium quantities; lump-sum transfers are
-    θ-blind under (SC5)).  Paper §4.6 "Tautology critique"
-    acknowledges this is welfare-economics-101: "the
-    welfare functional `W` is `θ`-blind once one accepts
-    the standard `W = CS + ∑Π - T` decomposition."
+    Citation discipline.  This factorisation is a definitional
+    accounting identity, not a theorem with a specific MWG
+    pointer: MWG §10.D introduces CS via demand-curve area and
+    §16.F the welfare theorems, but neither states "W = CS +
+    ΣΠ - T factors through allocation as W = wOfAlloc ∘ br" as
+    a numbered proposition.  Paper §4.6 "Tautology critique"
+    itself acknowledges this: "the welfare functional `W` is
+    `θ`-blind once one accepts the standard `W = CS + ∑Π - T`
+    decomposition."  Cited as a definitional accounting
+    identity over the standard CS, Π, T primitives — MWG §10.D
+    / §16.F supplied as background reference for those
+    primitives, NOT as the source of the factorisation
+    proposition.
 
-    Discipline note (audit R4).  This was previously
-    classified Cat 3 (paper-novel).  Paper §4.6 explicitly
-    states the factorisation IS welfare-economics-101, not
-    a paper-novel structural claim.  Re-categorised Cat 3
-    → Cat 2 to match paper self-assessment.  Substantive
-    contribution of T1 lives in (a) the Cobb-Douglas
-    isocline cost-min uniqueness step (Cat 2
-    `bestResponseUniqueAtThetaInvariantWelfare`) and (b)
-    the four-mechanism enumeration of
+    Substantive contribution of T1 lives in (a) the
+    Cobb-Douglas isocline cost-min uniqueness step (Cat 2
+    `mwg_cost_min_uniqueness_isocline` via MWG §5.D + convex
+    analysis) and (b) the four-mechanism enumeration of
     Proposition `\label{prop:four_mechanisms}`.
 
     Scope:
@@ -105,23 +102,26 @@ axiom welfareFactorsThroughAllocation
       ∀ (θ : OwnershipType) (a : AccessVector) (R : Regime),
         W.W θ a R = wOfAlloc (br.alloc θ R) a R
 
-/-! ### v0.3 decomposition of `bestResponseUniqueAtThetaInvariantWelfare`
+/-! ### Necessity: `bestResponseUniqueAtThetaInvariantWelfare`
 
     Paper `\label{thm:characterization}` (⇒) Necessity is a
-    case-split + textbook-fact composition.  v0.3 (v6 §3.4.6
-    reductionism round) decomposes the prior single atomic
-    axiom into three smaller atoms + a derived theorem:
+    case-split + textbook-fact composition, carried as three
+    atoms + a derived theorem:
 
       (a) `OnSameIsocline`  (Cat 3 hypothesisPredicate) — the
           case-1/case-2 discriminator: do two BR allocations
           (under distinct θ) lie on the same Cobb-Douglas
           isocline `c^β d^γ = const`?
       (b) `mwg_cost_min_uniqueness_isocline` (Cat 2 textbook —
-          MWG Prop 5.C.2(v)): under strict positivity of input
-          prices `r_c, w_d > 0` and convex isoclines (both
-          standard for Cobb-Douglas), the cost-minimum on a
-          given isocline is a single point — so two firm-optima
-          on the same isocline coincide.
+          MWG §5.D "Geometry of cost and supply" + elementary
+          convex analysis): under strict positivity of input
+          prices `r_c, w_d > 0`, the strictly-quasi-concave
+          Cobb-Douglas production function `c^β d^γ` has
+          strictly convex isoclines (MWG §5.D), and a linear
+          cost objective minimised over a strictly convex
+          feasible set has a unique minimum (elementary convex
+          analysis) — so two firm-optima on the same isocline
+          coincide.
       (c) `case_1_different_isoclines_implies_BR_invariant`
           (Cat 3 structuralEquation) — paper §4.3 Case 1: under
           welfare-θ-invariance, two BR allocations CANNOT lie on
@@ -142,63 +142,67 @@ axiom welfareFactorsThroughAllocation
     splits into Case 1 ("the two allocations lie on different
     isoclines of `c^β d^γ`") and Case 2 ("the two allocations
     lie on the same isocline").  We carry the same-isocline
-    predicate as an abstract Cat 3 hypothesis-predicate — the
-    paper introduces the isocline classifier as a primitive of
-    its Case 1 / Case 2 case-split argument.
+    predicate as a Cat 3 hypothesis-predicate — the paper
+    introduces the isocline classifier as a primitive of its
+    Case 1 / Case 2 case-split argument.
+
+    Encoding.  The predicate is an opaque `Prop` carrier whose
+    witness must come from outside the abstraction layer — the
+    substantive paper §4.3 content lives in the two consuming
+    axioms (`mwg_cost_min_uniqueness_isocline` and
+    `case_1_different_isoclines_implies_BR_invariant`); the
+    `by_cases` in the derived theorem works via `Classical.em`
+    on the opaque Prop, and cannot be unfolded to a tautology.
 
     Scope:
     Two BR allocations (under distinct θ-types) lie on the
-    same Cobb-Douglas isocline `c^β d^γ = const`.  Abstract
-    here as an opaque `Prop` over `(BestResponseMap, θ₁, θ₂,
-    Regime)`; the concrete isocline structure is in
-    `WelfareFunctional` paper §3.1, deliberately not exposed
-    at this abstraction layer. -/
-def OnSameIsocline (br : BestResponseMap) (θ₁ θ₂ : OwnershipType)
-    (R : Regime) : Prop :=
-  -- Paper-introduced discriminator: two BR allocations under
-  -- (θ₁, θ₂) yield identical equilibrium quality `q^*(θ_i) =
-  -- α c^β d^γ q^δ` (paper §3.1).  At our abstraction layer the
-  -- discriminator is opaque; we carry it as an axiomatised
-  -- predicate via the constant-named Prop `True` placeholder
-  -- — but the substantive paper content is in the two atomic
-  -- axioms (`mwg_cost_min_uniqueness_isocline` and
-  -- `case_1_different_isoclines_implies_BR_invariant`) that
-  -- consume this predicate.
-  -- (Carrier-only Prop; closure semantics are paper-stated
-  -- via the consuming axioms.)
-  ∀ _x : Unit, br.alloc θ₁ R = br.alloc θ₂ R ∨
-                br.alloc θ₁ R ≠ br.alloc θ₂ R
+    same Cobb-Douglas isocline `c^β d^γ = const`.  Opaque
+    `Prop` over `(BestResponseMap, θ₁, θ₂, Regime)`; the
+    concrete isocline structure is in `WelfareFunctional`
+    paper §3.1, deliberately not exposed at this abstraction
+    layer. -/
+axiom OnSameIsocline (br : BestResponseMap) (θ₁ θ₂ : OwnershipType)
+    (R : Regime) : Prop
 
 /-- *Cat 2 atomic external textbook axiom.*
 
-    **MWG Prop 5.C.2(v): cost-minimum uniqueness on a Cobb-Douglas
-    isocline.**
+    **Cost-minimum uniqueness on a Cobb-Douglas isocline (MWG §5.D
+    duality + elementary convex analysis).**
 
     Paper `\label{thm:characterization}` (⇒) Necessity Case 2:
     "the cost-minimising point on the isocline is unique given
     input prices `r_c` and `w_d` ... the unique cost-minimum on
     a given isocline (under strictly positive input prices and
-    convex isoclines) is a single point."
+    strictly quasi-concave production function ⇒ strictly
+    convex input requirement sets) is a single point."
+
+    Citation discipline.  The result is not a single numbered
+    MWG proposition: MWG §5.C Prop 5.C.2 enumerates standard
+    properties of `c(w,q)` and `z(w,q)` (homogeneity, concavity
+    in `w`, Shephard's lemma) but says nothing about cost-min
+    uniqueness on level sets.  Strictly-quasi-concave
+    production ⇒ strictly-convex isoclines is in MWG §5.D
+    "Geometry of cost and supply"; cost-min uniqueness then
+    follows by elementary convex analysis (linear input-cost
+    objective minimised over a strictly convex feasible set has
+    a unique minimum).  Cobb-Douglas `c^β d^γ` for `β, γ > 0`
+    is strictly quasi-concave, hence has strictly convex
+    isoclines.
 
     Citation: Mas-Colell, Whinston, Green, *Microeconomic
-    Theory*, Oxford University Press 1995, §5.C, Proposition
-    5.C.2(v) ("if input prices are strictly positive and the
-    production function is strictly concave on each output
-    level set, the cost-minimising input bundle on each level
-    set is unique").  Standard producer-theory textbook
-    result; the Cobb-Douglas isocline of paper
-    `\eqref{eq:quality_dynamics}` satisfies the strict-concavity
-    hypothesis on each output level set, and the paper's
-    `r_c, w_d > 0` input-prices assumption is the textbook
-    hypothesis.
+    Theory*, Oxford University Press 1995, §5.D "Geometry of
+    cost and supply" (strictly-quasi-concave production ⇒
+    strictly-convex isoclines), composed with elementary
+    convex analysis (linear functional on a strictly convex
+    set has a unique minimum).
 
     Scope:
     Atomic operational consequence: under same-isocline
     (`OnSameIsocline br θ₁ θ₂ R`), the two firm-optimal BR
-    allocations coincide.  The textbook proof of MWG 5.C.2(v)
-    lives in `gapBlocked` (Mathlib lacks producer-theory
-    cost-minimisation formalisation; see
-    `gap_FOEconomics_Mathlib_BLOCKED` in the ledger). -/
+    allocations coincide.  The Mathlib-derivation of the
+    underlying convex-analysis fact lives in `gapBlocked`
+    (Mathlib lacks the producer-theory level-set apparatus;
+    see `gap_FOEconomics_Mathlib_BLOCKED` in the ledger). -/
 axiom mwg_cost_min_uniqueness_isocline
     (br : BestResponseMap) (R : Regime) :
     ∀ (θ₁ θ₂ : OwnershipType),
@@ -239,7 +243,7 @@ axiom case_1_different_isoclines_implies_BR_invariant
       ¬ OnSameIsocline br θ₁ θ₂ R →
       br.alloc θ₁ R = br.alloc θ₂ R
 
-/-- *Derived theorem (v0.3 decomposition of former Cat 3 atomic).*
+/-- *Derived theorem.*
 
     **Necessity bridge: welfare-θ-invariance ⇒ best-response
     θ-invariance.**
@@ -250,8 +254,10 @@ axiom case_1_different_isoclines_implies_BR_invariant
       * Case 1 (different isoclines): paper §4.3 Case 1
         contradiction (via `case_1_different_isoclines_implies_-
         BR_invariant`).
-      * Case 2 (same isocline): MWG Prop 5.C.2(v) cost-min
-        uniqueness (via `mwg_cost_min_uniqueness_isocline`).
+      * Case 2 (same isocline): MWG §5.D + elementary convex
+        analysis cost-min uniqueness on the strictly-convex
+        Cobb-Douglas isocline (via
+        `mwg_cost_min_uniqueness_isocline`).
 
     Derivation (Lean):
     1. Pick a witness θ₀ : OwnershipType (e.g., `zero`).
@@ -283,41 +289,93 @@ theorem bestResponseUniqueAtThetaInvariantWelfare
 /-! ### Proposition~\ref{prop:four_mechanisms}
 
     Each of (M_α), (M_β), (M_γ), (M_δ) is sufficient for
-    ownership-invariance of the regime.  Encoded as direct
-    structural implications in Lean. -/
+    ownership-invariance of the regime.
+
+    The three mechanisms (M_β), (M_γ), (M_δ) are genuinely
+    distinct:
+      * (M_β) predicates on `R.financingMechanism` —
+        `prop_four_mechanisms_Mbeta` is an FOC-free derivation
+        using the financing-uniqueness conjunct.
+      * (M_δ) predicates on `R.externalConstraints` —
+        `prop_four_mechanisms_Mdelta` is an FOC-free derivation
+        using the singleton-constraint conjunct.
+      * (M_γ) is the opaque Cat 3 `ProfitWelfareGradientAlign`
+        predicate; its ⇒ ownership-invariance step is the
+        paper's FOC argument, encoded as the Cat 3
+        structural-equation axiom `gradientAlign_implies_-
+        ownership_invariant` below (parallel to
+        `SC1_implements_Malpha` / `SC3_implements_Mbeta`).
+
+    (M_α) — "rent-zero margin" — is the `MechanismMalpha`
+    `def` consumed as the load-bearing hypothesis of
+    Theorem~\ref{thm:longrun}; its standalone ⇒
+    ownership-invariance step also routes through the FOC
+    apparatus, so like (M_γ) it is not given a free-standing
+    FOC-free derivation (see README "Honest scope notes"). -/
+
+/-- *Cat 3 paper-novel atomic structural equation.*
+
+    **Paper `\label{prop:four_mechanisms}` clause (M_γ): gradient
+    alignment ⇒ ownership-invariance.**
+
+    Paper §3.3 (M_γ): "At the equilibrium, `∇_{(c_i,d_i)} Π_i =
+    ∇_{(c_i,d_i)} W`.  Then the convex combination
+    `(1-θ_i)Π_i + θ_i W` has θ_i-invariant FOC."  This FOC
+    argument — gradient alignment forces the convex-combination
+    objective's optimum to be θ-invariant — is a paper-stated
+    implementation step.  Lean does not model the producer-
+    theory gradient / FOC apparatus (the `gap_FOEconomics_-
+    Mathlib_BLOCKED` route), so the step is carried as a Cat 3
+    structural-equation axiom, parallel to `SC1_implements_-
+    Malpha` and `SC3_implements_Mbeta`.
+
+    Scope:
+    `ProfitWelfareGradientAlign P W br R → OwnershipInvariant
+    br R`.  Atomic paper-stated step; does NOT assert what
+    gradient alignment *is* (that is the opaque carrier
+    `ProfitWelfareGradientAlign`), only that it implies the
+    best-response is θ-invariant. -/
+axiom gradientAlign_implies_ownership_invariant
+    (P : ProfitFunctional) (W : WelfareFunctional)
+    (br : BestResponseMap) (R : Regime) :
+    ProfitWelfareGradientAlign P W br R → OwnershipInvariant br R
 
 /-- **Proposition~\ref{prop:four_mechanisms}, clause (M_β).**
 
-    If the regime pins investment `(c, d)` exogenously (e.g.,
-    via an incentive-compatible financing mechanism), then
-    the regime is ownership-invariant.
+    If the regime pins investment `(c, d)` exogenously via an
+    incentive-compatible financing mechanism, then the regime
+    is ownership-invariant.
 
-    *Why this clause has a non-trivial proof.* `(M_β)` is
-    formally the strongest of the four mechanisms — it
-    *directly says* the best-response is θ-invariant.  Our
-    Lean encoding therefore turns this into a literal
-    equality after unfolding definitions.  The non-trivial
-    content of the paper proposition is the *enumeration*
-    plus the long-run robustness asymmetry of
-    Theorem~\ref{thm:longrun}. -/
+    Proof (FOC-free derivation).  `MechanismMbeta`
+    gives a financing-designated allocation `xF` (at some price
+    normalisation `w_d`) that is the *unique* self-funded point
+    of `R.financingMechanism`, plus the fact that the best
+    response `br.alloc θ R` is self-funded for every `θ`.
+    Uniqueness then forces `br.alloc θ R = xF` for every `θ`,
+    which is exactly ownership-invariance with witness `xF`. -/
 theorem prop_four_mechanisms_Mbeta
     (br : BestResponseMap) (R : Regime) :
     MechanismMbeta br R → OwnershipInvariant br R := by
   intro h
-  obtain ⟨x, hx⟩ := h
-  exact ⟨x, hx⟩
+  obtain ⟨xF, _w_d, hUniq, hFunded⟩ := h
+  exact ⟨xF, fun θ => (hUniq (br.alloc θ R)).mp (hFunded θ)⟩
 
 /-- **Proposition~\ref{prop:four_mechanisms}, clause (M_γ).**
 
     If the convex-combination objective has θ-invariant FOC
     (i.e., `∇Π_i = ∇W` at the equilibrium), the best-response
-    is θ-invariant. -/
+    is θ-invariant.
+
+    Proof.  `MechanismMgamma P W br R` unfolds to the
+    opaque Cat 3 predicate `ProfitWelfareGradientAlign P W br
+    R`; the paper's FOC argument that gradient alignment
+    implies ownership-invariance is the Cat 3 structural-
+    equation axiom `gradientAlign_implies_ownership_invariant`. -/
 theorem prop_four_mechanisms_Mgamma
+    (P : ProfitFunctional) (W : WelfareFunctional)
     (br : BestResponseMap) (R : Regime) :
-    MechanismMgamma br R → OwnershipInvariant br R := by
-  intro h
-  obtain ⟨x, hx⟩ := h
-  exact ⟨x, hx⟩
+    MechanismMgamma P W br R → OwnershipInvariant br R :=
+  gradientAlign_implies_ownership_invariant P W br R
 
 /-- **Proposition~\ref{prop:four_mechanisms}, clause (M_δ).**
 
@@ -325,13 +383,21 @@ theorem prop_four_mechanisms_Mgamma
     external constraint that binds for all `θ_i ∈ [0,1]` at
     the same allocation, the regime is ownership-invariant.
     Examples: hardware-export caps, data-residency rules,
-    capacity caps. -/
+    capacity caps.
+
+    Proof (FOC-free derivation).  `MechanismMdelta`
+    gives an allocation `xC` such that `R.externalConstraints`
+    is the *singleton* `{xC}`, plus the fact that the best
+    response `br.alloc θ R` is feasible (satisfies the external
+    constraint) for every `θ`.  The singleton property then
+    forces `br.alloc θ R = xC` for every `θ`, which is exactly
+    ownership-invariance with witness `xC`. -/
 theorem prop_four_mechanisms_Mdelta
     (br : BestResponseMap) (R : Regime) :
     MechanismMdelta br R → OwnershipInvariant br R := by
   intro h
-  obtain ⟨x, hx⟩ := h
-  exact ⟨x, hx⟩
+  obtain ⟨xC, hSingleton, hFeasible⟩ := h
+  exact ⟨xC, fun θ => (hSingleton (br.alloc θ R)).mp (hFeasible θ)⟩
 
 /-! ### Theorem~\ref{thm:characterization} — the iff -/
 
@@ -370,12 +436,12 @@ theorem thm_characterization_suff
     If the welfare functional `W^*` is θ-invariant at fixed
     access vector `bmu`, then the regime is ownership-invariant.
 
-    Proof.  Direct consequence of the v0.3-derived theorem
+    Proof.  Direct consequence of the derived theorem
     `bestResponseUniqueAtThetaInvariantWelfare`, which composes
     paper §4.3 Case 1 (different-isoclines contradiction; Cat 3)
-    and Case 2 (MWG Prop 5.C.2(v) cost-min uniqueness on
-    Cobb-Douglas isocline; Cat 2) via classical case-split on
-    `OnSameIsocline`. -/
+    and Case 2 (MWG §5.D + elementary convex analysis cost-min
+    uniqueness on the strictly-convex Cobb-Douglas isocline;
+    Cat 2) via classical case-split on `OnSameIsocline`. -/
 theorem thm_characterization_nec
     (W : WelfareFunctional) (br : BestResponseMap)
     (a : AccessVector) (R : Regime) :
@@ -408,19 +474,5 @@ theorem thm_characterization
   refine ⟨?_, ?_⟩
   · exact thm_characterization_nec W br a R
   · exact thm_characterization_suff W br a R
-
-/-! ### Helpful corollaries / cross-references for downstream files -/
-
-/-- *Hidden assumption HA-2 (paper §4.6.2).*  The tautology
-    critique is acknowledged.  Lean-side: `thm_characterization`
-    is structurally iff at the carrier level; the substance is
-    in the enumeration + downstream composition.  Stated here as
-    a degenerate equivalence to surface the discipline note. -/
-theorem ha2_iff_acknowledged
-    (W : WelfareFunctional) (br : BestResponseMap)
-    (a : AccessVector) (R : Regime) :
-    (WelfareThetaInvariant W a R ↔ OwnershipInvariant br R) ↔
-    (WelfareThetaInvariant W a R ↔ OwnershipInvariant br R) :=
-  Iff.rfl
 
 end AccessOrthogonality

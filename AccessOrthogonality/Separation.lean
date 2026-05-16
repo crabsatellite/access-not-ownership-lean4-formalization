@@ -90,7 +90,14 @@ axiom SC1_implements_Malpha :
     Carrier of the SC3 → M_β implementation step.  The IC
     standard-conditions hypothesis (firm participation +
     weakly-best at compliance) is folded into the abstract
-    `BestResponseMap`. -/
+    `BestResponseMap`.  `MechanismMbeta` is the financing-
+    structured predicate (`∃ xF w_d'`, `xF` the unique
+    `R.financingMechanism`-self-funded point ∧ `br.alloc θ R`
+    self-funded for every θ).  This axiom asserts the paper
+    §4.7 implementation step: SC3 financing + standard IC
+    conditions ⇒ M_β.  The axiom takes the SC3 price level
+    `w_d` and produces `MechanismMbeta br R` (which
+    existentially re-binds its own `w_d'`). -/
 axiom SC3_implements_Mbeta :
     ∀ (br : BestResponseMap) (R : Regime) (w_d : ℝ),
       SC3_Financing R w_d → MechanismMbeta br R
@@ -129,7 +136,7 @@ structure ScopeConditions (R : Regime) (a : AccessVector) (w_d : ℝ) : Prop whe
     which Theorem~\ref{thm:longrun} uses for long-run
     capture-robustness. -/
 theorem thm_separation
-    (P : ProfitFunctional) (br : BestResponseMap)
+    (_P : ProfitFunctional) (br : BestResponseMap)
     (R : Regime) (a : AccessVector) (w_d : ℝ)
     (sc : ScopeConditions R a w_d) :
     OwnershipInvariant br R := by

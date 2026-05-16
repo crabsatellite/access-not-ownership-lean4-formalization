@@ -35,8 +35,8 @@
 
   ## Proof structure (paper Appendix A.2)
 
-  Two additively-decomposable channels under Shorrocks 1982
-  factor-source decomposition:
+  Two channels exhaustively partition the GE_0 deviation
+  under HA-7 (paper Appendix A.2 working assumption):
     1. Capital-share channel.  CES envelope on returns to
        scale Λ > 1 → per-unit capital rent scales 1/μ →
        capital share rises like (1-μ)/μ ≈ (1-μ) near μ = 1
@@ -45,21 +45,27 @@
        ~\ref{lem:bertrand}: verification rent at unbundling
        ν is at most `m · (1-ν)` → inequality contribution
        ≤ κ_2 · (1-ν).
-  Summing via Shorrocks yields the bound; θ-independence
-  follows from Corollary~\ref{thm:separation}.
+  Channel-exhaustion under HA-7 (`channels_exhaust_under_HA7`
+  Cat 3 atomic) yields the bound; θ-independence follows
+  from Corollary~\ref{thm:separation}.
 
   ## What we encode in Lean
 
   We carry the bound at the *structural* (real-arithmetic)
   level:
     * The two channel-contribution upper bounds `κ_1 s_K (1-μ)`
-      and `κ_2 (1-ν)` are Cat 2 atomic textbook inequalities
-      (citing the CES envelope and the Lizzeri rent bound).
-    * The additive composition via Shorrocks 1982 is a Cat 2
-      atomic textbook citation.
+      and `κ_2 (1-ν)` are Cat 3 paper-novel atomics
+      (`capital_share_channel_contribution` /
+      `verification_rent_channel_contribution`) — the bound
+      forms are paper-novel compositions.
+    * The two-channel exhaustion under HA-7 is a Cat 3
+      paper-novel atomic (`channels_exhaust_under_HA7`),
+      consumed by `gini_two_channel_partition`.
     * The Lerman-Yitzhaki comonotonicity translation is a
-      Cat 2 atomic textbook citation.
-  The top-level theorem composes these into the bound.
+      Cat 3 paper-novel atomic — the GE_0 → Gini transcription
+      with first-order coefficient match is paper-novel.
+  The top-level theorem composes these into the bound,
+  taking HA-7 as an explicit hypothesis parameter.
 -/
 
 import AccessOrthogonality.Basic
@@ -141,49 +147,61 @@ axiom sK : ℝ → ℝ
 
 /-! ### Cat 2 atomic external textbook axioms -/
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
     **κ_1(η) > 0 for η < 1.**
 
-    Paper Theorem~\ref{thm:gini} + Appendix A.2.  Citation:
-    Acemoglu and Restrepo, "The Race Between Man and Machine,"
-    *American Economic Review* 108(6), 2018, pp. 1488–1542,
-    Section IV (factor-share CES envelope at `η < 1`); and
-    Acemoglu and Restrepo, "Tasks, Automation, and the Rise
-    in U.S. Wage Inequality," *Econometrica* 90(5), 2022,
-    pp. 1973–2016, Theorem 2 (task-share-decline-under-
-    capital-deepening for gross complements).
+    Paper Theorem~\ref{thm:gini} + Appendix A.2.
+
+    Classification.  Acemoglu-Restrepo 2018 §IV characterizes
+    task-share dynamics under automation and A-R 2022 Thm 2
+    treats wage-inequality decomposition under task
+    displacement — neither states "κ_1 =
+    (1-η)·s_K^(0)·s_L^(0)·χ > 0 for η<1" as a result.  Those
+    papers supply ingredients; the closed-form parametrization
+    for κ_1 is paper-novel, hence Cat 3.
 
     Scope:
-    Atomic inequality `0 < κ_1(η)` whenever `η < 1`. -/
+    Atomic positivity `0 < κ_1(η)` whenever `η < 1`. -/
 axiom kappa1_pos : ∀ (η : ℝ), η < 1 → 0 < kappa1 η
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
     **κ_2 > 0.**
 
-    Paper Theorem~\ref{thm:gini} + Appendix A.2.  Citation:
-    Lizzeri, Alessandro, "Information Revelation and
-    Certification Intermediaries," *RAND Journal of
-    Economics* 30(2), 1999, pp. 214–231, Proposition 1
-    (rent-extraction by monopoly seller-certifier);
-    extension to bundled regime in Lemma~\ref{lem:lizzeri}.
+    Paper Theorem~\ref{thm:gini} + Appendix A.2.
+
+    Classification.  Lizzeri 1999 Prop 1 establishes positive
+    INFORMATION RENT for a monopoly separate certifier (cited
+    as the separate Cat 2 atomic
+    `lizzeri_1999_separate_certifier_rent`); here `κ_2` is the
+    GE_0-INEQUALITY COEFFICIENT proportional to the share of
+    consumer expenditure subject to verification rent at
+    baseline — a paper-novel composition of Lizzeri rent +
+    paper-stated κ_2-scaling apparatus, hence Cat 3.
 
     Scope:
-    Atomic inequality `0 < κ_2`. -/
+    Atomic positivity `0 < κ_2`. -/
 axiom kappa2_pos : 0 < kappa2
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation (definitional
+    share-of-mass non-negativity).*
 
     **`s_K(η) ≥ 0`.**
 
-    Paper §5.1 / Appendix A.2.  Citation: standard CES
-    accounting; capital task share is a share of total income
-    and hence non-negative.  Acemoglu and Restrepo (2018,
-    2022) for the task-share apparatus.
+    Paper §5.1 / Appendix A.2.
+
+    Classification.  Non-negativity of a share is definitional
+    (factor shares ∈ [0,1] by construction of "share of
+    mass"), not a theorem requiring external attribution.
+    A-R 2018/2022 supply the task-share *apparatus*
+    (definition + dynamics) but the non-negativity follows
+    definitionally from any "share-of-mass" interpretation —
+    hence Cat 3 (paper-stated atomic property of paper's
+    primitive `sK`).
 
     Scope:
-    Atomic inequality `0 ≤ sK η`. -/
+    Atomic non-negativity `0 ≤ sK η`. -/
 axiom sK_nonneg : ∀ (η : ℝ), 0 ≤ sK η
 
 /-! ### Cat 2 atomic external textbook axioms: the two
@@ -202,22 +220,25 @@ axiom sK_nonneg : ∀ (η : ℝ), 0 ≤ sK η
     Citation discipline.  This is Cat 3 (paper-novel) — it
     is the paper's *composition* of Acemoglu-Restrepo
     (2018, 2022) task-share dynamics with Korinek-Vipra
-    (2025) returns-to-scale apparatus.  The textbook
-    ingredients (CES factor-share dynamics; per-unit rent
-    scaling under `Λ > 1`) are external; the composition
-    yielding the bound form `κ_1 · s_K · (1-μ)` is
-    paper-novel.
+    (2025) returns-to-scale apparatus.  Cat 2 dependencies:
+    `acemoglu_restrepo_2018_factor_share_dynamics` (CES
+    envelope at `η < 1`) + `korinek_vipra_2025_returns_to_scale`
+    (per-unit rent scaling under `Λ > 1`); these are explicit
+    Lean dependencies (see Binding/Gini cross-references) —
+    the composition yielding the bound form `κ_1 · s_K · (1-μ)`
+    is paper-novel.
 
     Scope:
-    Returns the capital-channel contribution `capContrib`
-    bounded above by `κ_1 · s_K(η) · (1 - μ_product)`.  The
-    `η = 0` parameter slot represents "the CES elasticity at
-    the baseline empirical estimate"; the paper statement is
-    for generic `η < 1`. -/
+    Returns a non-negative capital-channel contribution
+    `capContrib ∈ [0, κ_1·s_K(η)·(1-μ_product)]`.  The `η = 0`
+    parameter slot represents "the CES elasticity at the
+    baseline empirical estimate"; the paper statement is for
+    generic `η < 1`. -/
 axiom capital_share_channel_contribution :
-    ∀ (I : InequalityFunctional)
-      (θ : OwnershipType) (a : AccessVector) (R : Regime),
+    ∀ (_I : InequalityFunctional)
+      (_θ : OwnershipType) (a : AccessVector) (_R : Regime),
       ∃ capContrib : ℝ,
+        0 ≤ capContrib ∧
         capContrib ≤ kappa1 0 * sK 0 * (1 - a.muProduct)
 
 /-- *Cat 3 paper-novel atomic structural equation.*
@@ -240,51 +261,22 @@ axiom capital_share_channel_contribution :
     `\label{rem:lizzeri_extension}`).
 
     Scope:
-    Returns the verification-channel contribution `verifContrib`
-    bounded above by `κ_2 · (1 - ν)`. -/
+    Returns a non-negative verification-channel contribution
+    `verifContrib ∈ [0, κ_2·(1-ν)]`. -/
 axiom verification_rent_channel_contribution :
-    ∀ (I : InequalityFunctional)
-      (θ : OwnershipType) (a : AccessVector) (R : Regime),
+    ∀ (_I : InequalityFunctional)
+      (_θ : OwnershipType) (a : AccessVector) (_R : Regime),
       ∃ verifContrib : ℝ,
+        0 ≤ verifContrib ∧
         verifContrib ≤ kappa2 * (1 - a.nu)
 
-/-- *Cat 2 atomic external textbook axiom.*
-
-    **Shorrocks 1982 additive factor-source decomposition
-    of `GE_0`.**
-
-    Paper Appendix A.2 ("Combining the channels"): mean
-    log deviation `GE_0` admits additive decomposition by
-    factor source under Shorrocks (1982).
-
-    Citation: Shorrocks, A. F., "Inequality Decomposition
-    by Factor Components," *Econometrica* 50(1), 1982,
-    pp. 193–211 (canonical factor-source decomposition
-    theorem for inequality indices).
-
-    Scope:
-    For any factor-source decomposition `(c_1, c_2)` of
-    `GE_0`, the change in `GE_0` is bounded by the sum of
-    per-component bounds.  Atomic textbook fact; does NOT
-    assert that the capital-share / verification-rent
-    decomposition itself is the "right" two-channel
-    partition — that part is paper-novel and lives in
-    `gini_two_channel_partition` below. -/
-axiom shorrocks_additive_decomposition_atomic :
-    ∀ (I : InequalityFunctional)
-      (θ : OwnershipType) (a : AccessVector) (R : Regime),
-      ∀ (c1 c2 : ℝ),
-        I.GE0 θ a R - I.GE0 θ baselineAccess R ≤ c1 + c2 ∨
-        I.GE0 θ a R - I.GE0 θ baselineAccess R ≤ c1 + c2
-
-/-! ### v0.3 decomposition of `gini_two_channel_partition`
+/-! ### Decomposition of `gini_two_channel_partition`
 
     Paper Appendix A.2 names HA-7 ("the capital-rent and
     verification-rent channels are not anti-correlated") as
     a discrete working assumption, distinct from the
-    structural partition step that consumes it.  v0.3 (v6
-    §3.4.6 reductionism round) splits the prior single Cat 3
-    atomic axiom into:
+    structural partition step that consumes it.  It is
+    carried as three atoms:
 
       (a) `HA7_channels_not_anti_correlated` (Cat 3
           hypothesisPredicate): HA-7 explicit predicate over
@@ -316,19 +308,20 @@ axiom shorrocks_additive_decomposition_atomic :
 
     Scope:
     HA-7 carrier — paper-introduced working-assumption
-    predicate.  Carried as a Prop over `(InequalityFunctional,
-    OwnershipType, AccessVector, Regime)` — the regime under
-    which the two-channel partition exhaustiveness applies.
-    Closure semantics paper-stated by the consuming axiom
+    predicate.  Carried as an OPAQUE Prop over
+    `(InequalityFunctional, OwnershipType, AccessVector, Regime)` —
+    the regime under which the two-channel partition
+    exhaustiveness applies.
+
+    Encoding.  HA-7 is an opaque carrier whose witness must be
+    supplied by the caller — HA-7 is a real working
+    assumption, classified by paper §3.7 as "(c) credence-good
+    partition exogeneity, two-direction effect".  Closure
+    semantics are paper-stated by the consuming axiom
     `channels_exhaust_under_HA7`. -/
-def HA7_channels_not_anti_correlated
+axiom HA7_channels_not_anti_correlated
     (_I : InequalityFunctional)
-    (_θ : OwnershipType) (_a : AccessVector) (_R : Regime) : Prop :=
-  -- Abstract HA-7 predicate.  At our abstraction layer the
-  -- regime-specific rank-correlation between the two channels
-  -- is not exposed in `InequalityFunctional`; HA-7 carries the
-  -- predicate as a paper-stated working-assumption Prop.
-  True
+    (_θ : OwnershipType) (_a : AccessVector) (_R : Regime) : Prop
 
 /-- *Cat 3 paper-novel atomic structural equation.*
 
@@ -366,34 +359,37 @@ axiom channels_exhaust_under_HA7 :
         I.GE0 θ a R - I.GE0 θ baselineAccess R ≤
           capContrib + verifContrib
 
-/-- *Derived theorem (v0.3 decomposition of former Cat 3 atomic).*
+/-- *Derived theorem.*
 
     **Two-channel partition under (HA-7).**
 
     Paper Appendix A.2 working assumption HA-7 + channel-
     exhaustion partition step composed.
 
+    HA-7 conditional.  The theorem requires a genuine HA-7
+    witness `hHA7` to be supplied by the caller:
+    `\label{thm:gini}` is conditional on HA-7, which paper §3.7
+    discloses as a contestable modeling commitment (HA-7
+    classification (c) "two-direction effect").
+
     Derivation (Lean):
-    1. Discharge HA-7 (`HA7_channels_not_anti_correlated`) by
-       its definitional `True` at this abstraction layer
-       (paper-stated working assumption; no operative
-       discharge needed for the channel-exhaustion direction
-       at the abstract `InequalityFunctional` layer).
+    1. Take `hHA7 : HA7_channels_not_anti_correlated I θ a R`
+       as an explicit hypothesis.
     2. Apply `channels_exhaust_under_HA7` (Cat 3 paper-novel
-       structural step) under HA-7.
+       structural step) under `hHA7`.
 
     *No paper-novel content beyond the HA-7 predicate +
     `channels_exhaust_under_HA7`.*  -/
-theorem gini_two_channel_partition :
-    ∀ (I : InequalityFunctional)
-      (θ : OwnershipType) (a : AccessVector) (R : Regime),
-      ∀ (capContrib verifContrib : ℝ),
-        capContrib ≤ kappa1 0 * sK 0 * (1 - a.muProduct) →
-        verifContrib ≤ kappa2 * (1 - a.nu) →
-        I.GE0 θ a R - I.GE0 θ baselineAccess R ≤
-          capContrib + verifContrib := by
-  intro I θ a R capContrib verifContrib hCapBd hVerifBd
-  have hHA7 : HA7_channels_not_anti_correlated I θ a R := trivial
+theorem gini_two_channel_partition
+    (I : InequalityFunctional)
+    (θ : OwnershipType) (a : AccessVector) (R : Regime)
+    (hHA7 : HA7_channels_not_anti_correlated I θ a R) :
+    ∀ (capContrib verifContrib : ℝ),
+      capContrib ≤ kappa1 0 * sK 0 * (1 - a.muProduct) →
+      verifContrib ≤ kappa2 * (1 - a.nu) →
+      I.GE0 θ a R - I.GE0 θ baselineAccess R ≤
+        capContrib + verifContrib := by
+  intro capContrib verifContrib hCapBd hVerifBd
   exact channels_exhaust_under_HA7 I θ a R hHA7
     capContrib verifContrib hCapBd hVerifBd
 
@@ -416,27 +412,32 @@ theorem gini_two_channel_partition :
     equilibrium quantities `(c^*, d^*)` are θ-invariant, so
     the rent flows underlying both channels are θ-invariant.
     The bound therefore holds independently of θ (paper
-    Appendix A.2 "Independence of θ"). -/
+    Appendix A.2 "Independence of θ").
+
+    *HA-7 conditional.*  The theorem takes
+    `hHA7 : HA7_channels_not_anti_correlated I θ a R` as an
+    explicit hypothesis.  Paper §3.7 discloses HA-7 as a
+    contestable modeling commitment; the Lean signature
+    surfaces it explicitly.  -/
 theorem thm_gini
     (I : InequalityFunctional)
-    (θ : OwnershipType) (a : AccessVector) (R : Regime) :
+    (θ : OwnershipType) (a : AccessVector) (R : Regime)
+    (hHA7 : HA7_channels_not_anti_correlated I θ a R) :
     I.GE0 θ a R - I.GE0 θ baselineAccess R ≤
       kappa1 0 * sK 0 * (1 - a.muProduct) + kappa2 * (1 - a.nu) := by
   -- Step 1: extract the capital-share channel contribution.
-  obtain ⟨capContrib, hCapBd⟩ :=
+  obtain ⟨capContrib, _hCapNonneg, hCapBd⟩ :=
     capital_share_channel_contribution I θ a R
   -- Step 2: extract the verification-rent channel contribution.
-  obtain ⟨verifContrib, hVerifBd⟩ :=
+  obtain ⟨verifContrib, _hVerifNonneg, hVerifBd⟩ :=
     verification_rent_channel_contribution I θ a R
   -- Step 3: combine the two channels under (HA-7) via the
-  --   paper-novel two-channel partition (Cat 3).  Shorrocks
-  --   1982 (Cat 2 atomic) supplies the underlying additive-
-  --   decomposability of GE_0; the paper-novel partition
-  --   step asserts that capital-share + verification-rent
-  --   exhaust the decomposition under HA-7.
+  --   paper-novel two-channel partition (derived theorem
+  --   `gini_two_channel_partition` from
+  --   `channels_exhaust_under_HA7` Cat 3 atomic).
   have hAdd : I.GE0 θ a R - I.GE0 θ baselineAccess R ≤
       capContrib + verifContrib :=
-    gini_two_channel_partition I θ a R
+    gini_two_channel_partition I θ a R hHA7
       capContrib verifContrib hCapBd hVerifBd
   -- Step 4: chain the channel bounds.
   calc I.GE0 θ a R - I.GE0 θ baselineAccess R
@@ -455,8 +456,8 @@ theorem thm_gini
     Corollary~\ref{thm:separation} giving θ-invariance of
     `(c^*, d^*)`). -/
 theorem thm_gini_theta_invariance
-    (I : InequalityFunctional)
-    (θ₁ θ₂ : OwnershipType) (a : AccessVector) (R : Regime) :
+    (_I : InequalityFunctional)
+    (_θ₁ _θ₂ : OwnershipType) (a : AccessVector) (_R : Regime) :
     (kappa1 0 * sK 0 * (1 - a.muProduct) + kappa2 * (1 - a.nu))
     = (kappa1 0 * sK 0 * (1 - a.muProduct) + kappa2 * (1 - a.nu)) := by
   rfl
@@ -510,15 +511,18 @@ axiom lerman_yitzhaki_comonotonicity_translation :
       G^* - G^{(0)} ≤ κ_1 · s_K(η) · (1 - μ) + κ_2 · (1 - ν).
 
     Proof.  Apply `lerman_yitzhaki_comonotonicity_translation`
-    to the `GE_0` bound from `thm_gini`. -/
+    to the `GE_0` bound from `thm_gini`.
+
+    *HA-7 conditional.*  Inherits HA-7 from `thm_gini`. -/
 theorem cor_gini
     (I : InequalityFunctional)
-    (θ : OwnershipType) (a : AccessVector) (R : Regime) :
+    (θ : OwnershipType) (a : AccessVector) (R : Regime)
+    (hHA7 : HA7_channels_not_anti_correlated I θ a R) :
     I.Gini θ a R - I.Gini θ baselineAccess R ≤
       kappa1 0 * sK 0 * (1 - a.muProduct) + kappa2 * (1 - a.nu) := by
   have hGE0 : I.GE0 θ a R - I.GE0 θ baselineAccess R ≤
       kappa1 0 * sK 0 * (1 - a.muProduct) + kappa2 * (1 - a.nu) :=
-    thm_gini I θ a R
+    thm_gini I θ a R hHA7
   exact lerman_yitzhaki_comonotonicity_translation I θ a R hGE0
 
 /-! ### Monotonicity properties of the bound -/

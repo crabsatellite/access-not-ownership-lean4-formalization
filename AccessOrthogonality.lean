@@ -45,13 +45,17 @@
   Gap ledger:
     AccessOrthogonality/Ledger.lean — typed record of every
     atomic axiom, every Cat 3 carrier, every blocked route, and
-    every closed top-level result.  Two orthogonal
+    every closed top-level result.  Three orthogonal
     classifications per entry:
-      * 5-tier status: gapOpen / gapPartial / gapBlocked /
-                       gapDeadEnd / gapClosed
-      * 3-input-category: cat1Mathlib / cat2External /
+      * 7-tier status: gapOpen / gapPartial / gapBlocked /
+                       gapDeadEnd / gapClosed /
+                       gapClosedConditional / gapDefinitional
+      * 4-input-category: cat1Mathlib / cat2External /
                           cat3PaperNovel / notInput
-    Canonical attack-history record.
+      * Cat 3 sub-type: carrier / hypothesisPredicate /
+                        structuralEquation / workingAssumption /
+                        conditionalHypothesis /
+                        phenomenologicalConjecture / notCat3
 -/
 
 import AccessOrthogonality.Basic

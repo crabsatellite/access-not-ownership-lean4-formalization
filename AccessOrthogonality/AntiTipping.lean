@@ -53,12 +53,14 @@
       `noncomputable def`.
     * The single-lever bound `ω > (Λ - 1) / [δ + (β+γ) w_p]
       ⇒ Λ^eff < 1` as a theorem with pure real-arithmetic
-      proof (Cat 1 derivable).
-    * The four-lemma anti-tipping result as a theorem
-      statement parametrised over the four atomic
-      ingredient axioms (Cat 2 paper-novel
-      structural-property axioms encoding the Korinek-Vipra
-      stability content).
+      proof.
+    * The anti-tipping result `thm_antitipping` as a theorem
+      parametrised over the `StructurallyDecoupled` paper-
+      introduced hypothesis predicate; the quantitative
+      content is `single_lever_bound`, and the carriers
+      `eta_attenuation` + its boundary/unit-interval atomic
+      structural equations encode the Korinek-Vipra
+      stability content.
 -/
 
 import AccessOrthogonality.Basic
@@ -97,21 +99,17 @@ axiom eta_attenuation : ℝ → ℝ
     operative range `ν ≥ 2/K_max` of Remark
     `\label{rem:below_threshold}`.
 
-    Honest scope (audit R9).  The Lean axiom claims
-    `0 ≤ η(ν) ≤ 1` for ALL `ν : ℝ`, which is slightly
-    stronger than what the paper directly supports: for
-    `ν < 2/K_max` (below-threshold regime), `K(ν) ∈ {0, 1}`
-    and the Bertrand argument does not apply (paper Remark
-    `\label{rem:below_threshold}`).  Below threshold the
-    rent floor remains at the bundled value `m_bundled` and
-    the bound `0 ≤ η ≤ 1` is a paper-stated normalisation
-    choice on the operative range, extended to all `ν` for
-    Lean-encoding tractability.  This is honest about
-    encoding `0 ≤ η(ν) ≤ 1` as paper-stated discipline on
-    the operative range, not as a derived consequence of
-    the η(ν) formula. -/
+    Domain.  The axiom is stated on `0 ≤ ν ≤ 1`, the paper's
+    operative range; `AccessVector` components satisfy this by
+    construction via `hNuLo / hNuHi`.  Paper Remark
+    `\label{rem:below_threshold}` notes `K(ν) ∈ {0, 1}` for
+    `ν < 2/K_max`; the bound `0 ≤ η ≤ 1` is a paper-stated
+    normalisation on `ν ∈ [0, 1]`.  Below `ν = 2/K_max` the
+    rent floor remains at `m_bundled` (`η = 0` recorded
+    separately as `eta_attenuation_at_zero`). -/
 axiom eta_attenuation_unit_interval :
-    ∀ (ν : ℝ), 0 ≤ eta_attenuation ν ∧ eta_attenuation ν ≤ 1
+    ∀ (ν : ℝ), 0 ≤ ν → ν ≤ 1 →
+      0 ≤ eta_attenuation ν ∧ eta_attenuation ν ≤ 1
 
 /-- The Korinek-Vipra returns-to-scale parameters. -/
 structure ScalingParameters where
@@ -259,7 +257,7 @@ theorem single_lever_bound
   -- Use `(1 - π) ≤ 1` and `(1 - η(ν)) ≤ 1`.
   have hPi : 1 - a.pi ≤ 1 := by linarith [a.hPiLo]
   have hNu : 1 - eta_attenuation a.nu ≤ 1 := by
-    have h := (eta_attenuation_unit_interval a.nu).1
+    have h := (eta_attenuation_unit_interval a.nu a.hNuLo a.hNuHi).1
     linarith
   -- Bound the rent share.
   have hWeights : sp.w_p + sp.w_pi + sp.w_nu = 1 := sp.hWsum

@@ -309,46 +309,87 @@ structure ProfitFunctional where
     sense `Π_i^*(m) = 0` (paper Step 1: "Hence provider
     profit `Π_i^*(m) = ... = 0` uniformly in `m`").
 
-    Lean encoding choice (audit R6 honesty).  We encode the
-    *uniform-rent* form `P.Pi x θ R = 0` for all `(x, θ)`,
-    matching the long-run Step 1 strengthening.  This is
-    stronger than the static-only Prop `\label{prop:four_mechanisms}`
-    clause (M_α) marginal form.  The static-only marginal
-    form is `prop_four_mechanisms_Mbeta` via the
-    operational consequence path used in `thm_separation`. -/
+    Lean encoding choice.  We encode the *uniform-rent* form
+    `P.Pi x θ R = 0` for all `(x, θ)`, matching the long-run
+    Step 1 strengthening.  This is stronger than the
+    static-only Prop `\label{prop:four_mechanisms}` clause
+    (M_α) marginal form.  The static-only marginal form is
+    `prop_four_mechanisms_Mbeta` via the operational
+    consequence path used in `thm_separation`. -/
 def MechanismMalpha (P : ProfitFunctional) (R : Regime) : Prop :=
   ∀ (x : Investment) (θ : OwnershipType), P.Pi x θ R = 0
 
 /-- *Exogenous choice* `(M_β)` (Proposition
     `\label{prop:four_mechanisms}` clause (M_β)).
 
-    Paper §3.3: the regulator's financing mechanism pins
-    `(c_i, d_i)` regardless of `θ_i`.  Lean encoding is the
-    direct operational form `∃ x, ∀ θ, alloc θ R = x`. -/
+    Paper §3.3 + §4.7: the regulator's financing mechanism
+    pins `(c_i, d_i)` regardless of `θ_i` — "the financing
+    mechanism `F` is structured so that `F_i` is paid out
+    conditional on the firm delivering the prescribed quality
+    target ... the firm's best response is `(c_i, d_i) =
+    (c^F_i, d^F_i)` regardless of `θ_i`."
+
+    Encoding.  M_β predicates on `R.financingMechanism` — at
+    some price normalisation `w_d`, the regime's financing
+    mechanism designates a *unique* self-funded allocation
+    `xF` (the "prescribed quality target" of paper §4.7), and
+    the firm's best response is self-funded for every `θ`.
+    Both conjuncts are load-bearing in
+    `prop_four_mechanisms_Mbeta`'s axiom-free derivation:
+    `br.alloc θ R` is self-funded ⇒ (by uniqueness) `= xF`.
+    The second conjunct is strictly weaker than
+    `∀ θ, alloc θ R = xF` (it only says the allocation is
+    funded, not that it equals `xF`), so the uniqueness
+    conjunct genuinely does the work.  `w_d` is existentially
+    bound inside the predicate, so `MechanismMbeta br R` keeps
+    its `(br, R)` arity.  FOC-free — M_β does not route
+    through the producer-theory cost-min apparatus. -/
 def MechanismMbeta (br : BestResponseMap) (R : Regime) : Prop :=
-  ∃ x : Investment, ∀ θ : OwnershipType, br.alloc θ R = x
+  ∃ (xF : Investment) (w_d : ℝ),
+    (∀ x : Investment,
+      R.financingMechanism x = x.qualityCost w_d ↔ x = xF) ∧
+    (∀ θ : OwnershipType,
+      R.financingMechanism (br.alloc θ R)
+        = (br.alloc θ R).qualityCost w_d)
+
+/-- *Cat 3 paper-novel hypothesis predicate.*  Gradient
+    alignment `∇_{(c_i,d_i)} Π_i = ∇_{(c_i,d_i)} W` at the
+    equilibrium (Proposition `\label{prop:four_mechanisms}`
+    clause (M_γ)).
+
+    Opaque carrier.  Paper §3.3 (M_γ): at the equilibrium the
+    provider's profit gradient and the welfare gradient on the
+    investment variables coincide.  Unlike (M_β) and (M_δ) —
+    which are FOC-free structural conditions on the regime's
+    financing / external-constraint apparatus — (M_γ) is a
+    *first-order-condition* statement about the profit and
+    welfare functionals.  Lean does not model the producer-
+    theory gradient apparatus (it is the `gap_FOEconomics_-
+    Mathlib_BLOCKED` route), so gradient alignment is carried
+    as an opaque Cat 3 hypothesis predicate over
+    `(ProfitFunctional, WelfareFunctional, BestResponseMap,
+    Regime)`. -/
+axiom ProfitWelfareGradientAlign
+    (P : ProfitFunctional) (W : WelfareFunctional)
+    (br : BestResponseMap) (R : Regime) : Prop
 
 /-- *Gradient alignment* `(M_γ)` (Proposition
     `\label{prop:four_mechanisms}` clause (M_γ)).
 
-    Paper §3.3: at the equilibrium, `∇_{(c_i,d_i)} Π_i =
-    ∇_{(c_i,d_i)} W` on the investment variables.  Lean
-    encoding is the OPERATIONAL CONSEQUENCE form: "the
-    convex-combination objective `(1-θ)Π + θW` has
-    θ-invariant best-response", which by paper FOC analysis
-    follows from `∇Π = ∇W`.
-
-    Honest scope note (audit R6).  The Lean type of (M_γ)
-    coincides with (M_β) — both say `∃ x, ∀ θ, alloc θ R =
-    x`.  The paper-level distinction is in the MECHANISM
-    that produces the operational form: (M_β) by mechanism
-    (regulator pins choice), (M_γ) by FOC (gradients align,
-    so the convex-combination's optimum is θ-invariant).
-    Lean cannot distinguish the mechanisms at the
-    propositional level without a richer carrier; the
-    Lean-level coincidence is honest about this. -/
-def MechanismMgamma (br : BestResponseMap) (R : Regime) : Prop :=
-  ∃ x : Investment, ∀ θ : OwnershipType, br.alloc θ R = x
+    Encoding.  M_γ is the opaque Cat 3
+    `ProfitWelfareGradientAlign P W br R` predicate, which
+    *depends on the profit and welfare functionals* `P`, `W`
+    (M_β / M_δ depend only on `R`'s financing / external-
+    constraint fields).  The M_γ ⇒ ownership-invariance step
+    is the paper's FOC argument ("the convex combination
+    `(1-θ)Π + θW` has θ-invariant FOC"), encoded as the Cat 3
+    structural-equation axiom `gradientAlign_implies_ownership_-
+    invariant` in `Characterization.lean` — parallel to how
+    `SC1_implements_Malpha` / `SC3_implements_Mbeta` encode
+    paper-stated implementation steps as Cat 3 atomics. -/
+def MechanismMgamma (P : ProfitFunctional) (W : WelfareFunctional)
+    (br : BestResponseMap) (R : Regime) : Prop :=
+  ProfitWelfareGradientAlign P W br R
 
 /-- *Constraint-set invariance* `(M_δ)` (Proposition
     `\label{prop:four_mechanisms}` clause (M_δ)).
@@ -358,13 +399,20 @@ def MechanismMgamma (br : BestResponseMap) (R : Regime) : Prop :=
     `θ_i ∈ [0,1]` at the same allocation (e.g., hardware-
     export controls, data-residency rules, capacity caps).
 
-    Honest scope note (audit R6).  As with (M_γ), the Lean
-    type coincides with (M_β).  Paper-level distinction is
-    in the MECHANISM (external constraint set, not regulator
-    financing), which Lean cannot carry without a richer
-    representation of "feasibility set". -/
+    Encoding.  M_δ predicates on `R.externalConstraints` —
+    the regime's external-constraint set is the *singleton*
+    `{xC}` (the constraint "binds at the same allocation"),
+    and the firm's best response is feasible for every `θ`.
+    Both conjuncts are load-bearing in
+    `prop_four_mechanisms_Mdelta`'s axiom-free derivation:
+    `br.alloc θ R` is feasible ⇒ (by the singleton property)
+    `= xC`.  FOC-free — M_δ routes through the
+    external-constraint set, not the firm's interior
+    optimisation. -/
 def MechanismMdelta (br : BestResponseMap) (R : Regime) : Prop :=
-  ∃ x : Investment, ∀ θ : OwnershipType, br.alloc θ R = x
+  ∃ xC : Investment,
+    (∀ x : Investment, R.externalConstraints x ↔ x = xC) ∧
+    (∀ θ : OwnershipType, R.externalConstraints (br.alloc θ R))
 
 /-! ### The six paper-stated scope conditions (SC1)–(SC6)
 
@@ -391,24 +439,25 @@ def SC2_Interoperability (R : Regime) : Prop := R.effectiveScaleExponent ≤ 1
 def SC3_Financing (R : Regime) (w_d : ℝ) : Prop :=
   ∃ xF : Investment, R.financingMechanism xF = xF.qualityCost w_d
 
-/-- **(SC4)** Ex-ante operational `bmu`: the access-structure
-    components are operationally defined before any welfare
-    claim is made (paper §3.2).  Carried as a placeholder Prop
-    `True` because Lean cannot verify "before any welfare
-    claim is made" — this is a methodological side-condition. -/
-def SC4_ExAnte (_ : AccessVector) : Prop := True
+/-- *Cat 3 paper-novel atomic hypothesis predicate.*  **(SC4)**
+    Ex-ante operational `bmu`: the access-structure components
+    are operationally defined before any welfare claim is made
+    (paper §3.2).  Carried as an opaque predicate so that
+    `ScopeConditions` constructions must supply a genuine
+    witness rather than discharging SC4 trivially. -/
+axiom SC4_ExAnte : AccessVector → Prop
 
-/-- **(SC5)** Lump-sum transferability.  Carried as a
-    placeholder Prop `True` because this is a standard
-    Mathlib-orthogonal welfare-economics assumption (second
-    welfare theorem applies). -/
-def SC5_LumpSum : Prop := True
+/-- *Cat 3 paper-novel atomic hypothesis predicate.*  **(SC5)**
+    Lump-sum transferability.  Paper §3.3 — (SC5) is the
+    standard second-welfare-theorem precondition; carried as
+    an opaque predicate so the assumption is surfaced
+    explicitly at every consumer. -/
+axiom SC5_LumpSum : Prop
 
-/-- **(SC6)** Downstream homogeneity-of-degree-one: production
-    is HD-1 in access `a_j` conditional on `k_j`.  Carried as
-    a placeholder Prop `True`; the operational content is
-    captured by the abstract welfare functional being
-    well-defined. -/
-def SC6_HD1 : Prop := True
+/-- *Cat 3 paper-novel atomic hypothesis predicate.*  **(SC6)**
+    Downstream homogeneity-of-degree-one: production is HD-1 in
+    access `a_j` conditional on `k_j`.  Paper §3.4
+    disclosure-discipline; carried as an opaque predicate. -/
+axiom SC6_HD1 : Prop
 
 end AccessOrthogonality

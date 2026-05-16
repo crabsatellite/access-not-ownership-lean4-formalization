@@ -44,16 +44,23 @@
 
   ## What we encode in Lean
 
-    * Three Cat 2 atomic textbook axioms encoding the rent-
-      and-Bertrand characterisations from Darby-Karni 1973,
-      Klein-Leffler 1981, Lizzeri 1999, and Fauré-Grimaud-
-      Peyrache 2009.
-    * One Cat 3 paper-novel atomic axiom encoding
-      Lemma~\ref{lem:independence}'s `(ω, π)`-invariance of
-      the per-output credence-good gap (extension beyond
-      Lizzeri 1999 to the integrated seller-certifier
-      configuration).
-    * The main theorem composing these.
+    * One Cat 2 atomic external-textbook axiom:
+      `lizzeri_1999_separate_certifier_rent` (Lizzeri 1999
+      RAND 30(2) Prop 1, separate-intermediary case).
+    * Eight Cat 3 paper-novel atomics: `lemma_independence_gap`
+      ((ω,π)-invariance of the credence-good gap),
+      `bundled_extension_via_independence` (integrated-
+      seller-certifier extension), `mBertrand` carrier +
+      `mBertrand_nonneg` / `mBertrand_monotone` /
+      `mBertrand_one_le_bundled` structural facts, and
+      `welfare_gap_at_reference`.
+    * The main theorem `thm_t4_binding` composing these.
+
+  Citation discipline: the module has 1 Cat 2 axiom +
+  8 Cat 3 atomics (per live `#eval` in `Ledger.lean`).
+  Darby-Karni 1973 / Klein-Leffler 1981 are background
+  apparatus only — not chained as Lean Cat 2 dependencies;
+  see the `gap_lemma_independence_gap` ledger entry.
 -/
 
 import AccessOrthogonality.Basic
@@ -87,17 +94,14 @@ structure WelfareAccessFunctional where
     the credence-good portion of the foundation-model output
     space.
 
-    Citation: Li 2026, `\label{lem:independence}`.  Bridging
-    extension of:
-    * Darby and Karni, "Free Competition and the Optimal
-      Amount of Fraud," *Journal of Law and Economics* 16(1),
-      1973, pp. 67–88 (credence-good framework).
-    * Klein and Leffler, "The Role of Market Forces in
-      Assuring Contractual Performance," *Journal of
-      Political Economy* 89(4), 1981, pp. 615–641
-      (reputation-aggregation framework).
+    Citation: Li 2026, `\label{lem:independence}` only.
+    (External background context — Darby-Karni 1973
+    credence-good framework, Klein-Leffler 1981 reputation-
+    aggregation framework — is not claimed here as a Lean
+    Cat 2 dependency; a Cat 3 structuralEquation docstring
+    cites the paper `\label{...}` only.)
 
-    Scope (audit R8 — domain restriction):
+    Scope (domain restriction):
     Atomic structural statement on the paper-stated domain
     `(ω, π) ∈ [0,1]^2`, `ν ∈ [0,1]`: for any credence-good
     `WelfareAccessFunctional` `W_cred`, the welfare
@@ -119,19 +123,17 @@ axiom lemma_independence_gap :
         W.Wcred ω₂ π₂ ν - W.Wcred ω₂ π₂ 0
 
 /-! ### Cat 2 atomic external textbook axioms +
-       v0.3 Cat 3 reductionism decomposition of
-       `lemma_lizzeri_bundled_rent` -/
+       Cat 3 decomposition of `lemma_lizzeri_bundled_rent` -/
 
-/-! ### v0.3 decomposition of `lemma_lizzeri_bundled_rent`
+/-! ### Decomposition of `lemma_lizzeri_bundled_rent`
 
     Paper `\label{lem:lizzeri}` + Remark
     `\label{rem:lizzeri_extension}` make the structural
     distinction explicit: the SEPARATE-intermediary case is
     Lizzeri 1999 Prop 1 (external textbook); the
     INTEGRATED-seller-certifier extension is paper-novel and
-    rests on Lemma `\label{lem:independence}`.  v0.3 (v6
-    §3.4.6 reductionism round) splits the prior single Cat 3
-    atomic axiom into:
+    rests on Lemma `\label{lem:independence}`.  It is carried
+    as three atoms:
 
       (a) `lizzeri_1999_separate_certifier_rent` (Cat 2 —
           Lizzeri 1999 *RAND J. Econ.* 30(2) Prop 1):
@@ -208,7 +210,7 @@ axiom bundled_extension_via_independence :
     ∀ (m_separate : ℝ), 0 < m_separate →
       ∃ m_bundled : ℝ, 0 < m_bundled
 
-/-- *Derived theorem (v0.3 decomposition of former Cat 3 atomic).*
+/-- *Derived theorem.*
 
     **Lemma~\ref{lem:lizzeri}: integrated seller-certifier
     rent (extension of Lizzeri 1999).**
@@ -248,7 +250,7 @@ theorem lemma_lizzeri_bundled_rent :
     are recorded as separate atomic axioms below. -/
 axiom mBertrand : ℝ → ℝ
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
     **Non-negativity of `m_Bertrand`.**
 
@@ -256,19 +258,17 @@ axiom mBertrand : ℝ → ℝ
     K(ν)` is the ratio of a positive credibility-maintenance
     cost over a positive certifier count, hence non-negative.
 
-    Citation: Tirole, Jean, *The Theory of Industrial
-    Organization*, MIT Press 1988, Chapter 5 (Bertrand price
-    competition with `K ≥ 2` symmetric firms collapses to
-    marginal-cost pricing at the symmetric equilibrium); the
-    `c_R / K(ν)` fee characterisation is the canonical
-    Bertrand-equilibrium-with-fixed-cost-`c_R`-amortised-
-    across-`K`-certifiers form.
+    Classification.  Non-negativity of `c_R / K(ν)` is
+    definitional (positive numerator over positive count), not
+    a textbook result — hence Cat 3 (paper-novel structural
+    equation on the paper-introduced primitive `mBertrand`),
+    not a Cat 2 textbook citation.
 
     Scope:
     Atomic non-negativity `0 ≤ mBertrand ν` for all `ν`. -/
 axiom mBertrand_nonneg : ∀ ν : ℝ, 0 ≤ mBertrand ν
 
-/-- *Cat 2 atomic external textbook axiom.*
+/-- *Cat 3 paper-novel atomic structural equation.*
 
     **Monotonicity of `m_Bertrand`.**
 
@@ -279,11 +279,11 @@ axiom mBertrand_nonneg : ∀ ν : ℝ, 0 ≤ mBertrand ν
     `m_Bertrand` is monotone non-increasing in `ν` on
     `[0, 1]`.
 
-    Citation: Tirole, *The Theory of Industrial
-    Organization*, MIT Press 1988, Ch. 5 §5.7 (entry under
-    fixed cost; the per-certifier rent at the symmetric
-    Bertrand equilibrium scales inversely in the number of
-    competitors).
+    Classification.  Monotonicity of `c_R / K(ν)` in `ν`
+    follows from `K(ν)` monotone non-decreasing in `ν` (paper
+    Assumption \ref{ass:reputation}: `K(ν) = ⌈K_max·ν⌉`) —
+    pure arithmetic on a paper-introduced primitive, hence
+    Cat 3.
 
     Scope:
     Atomic monotonicity `ν₁ ≤ ν₂ ⇒ mBertrand ν₂ ≤ mBertrand ν₁`
@@ -342,7 +342,7 @@ axiom mBertrand_one_le_bundled :
     `m_bundled - m_Bertrand(1)` at the unbundled saturation
     limit by the integrated-rent extension of Lizzeri 1999.
 
-    Scope (audit R8 — domain restriction).  Atomic statement
+    Scope (domain restriction).  Atomic statement
     that there exists `c > 0` such that
     `c · ν ≤ W^*(0, 0, ν) - W^*(0, 0, 0)` on the
     paper-stated domain `ν ∈ [0, 1]`.  The paper does NOT
