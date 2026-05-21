@@ -8,7 +8,7 @@ corollaries of
 
 **Paper:**
 - SSRN abstract id [6733543](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6733543)
-- Zenodo DOI: TODO (to be added after Zenodo deposit)
+- Zenodo DOI: [10.5281/zenodo.20079537](https://doi.org/10.5281/zenodo.20079537) (concept DOI; resolves to latest version)
 
 ## Status
 
