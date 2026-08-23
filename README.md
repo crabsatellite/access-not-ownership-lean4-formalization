@@ -8,8 +8,9 @@ not the historical extended-paper theorem inventory.
 - 26/26 numbered formal objects are present in the proof-carrying ledger.
 - 20/20 displayed formulas have adjacent TeX-to-Lean bindings.
 - 11 derived mathematical entries are kernel proved.
-- Paper Infrastructure schema 2 binds 52 atomic manuscript claims: 46 formal
-  roots and 6 explicit scope boundaries.
+- Paper Infrastructure v2.4.0 binds 77 atomic manuscript claims: 46 formal
+  roots, 6 explicit scope boundaries, and 25 restatement/proof/application
+  relations.
 - Definitions and maintained assumptions are typed at their manuscript role.
 - The current-paper namespace has no `axiom`, `opaque`, `sorry`, `admit`, or
   `native_decide` declaration.
