@@ -84,6 +84,21 @@ def OperativeUnbundling
     (R : ReputationAggregationAssumption) (nu : ℝ) : Prop :=
   2 ≤ R.countRule.count nu
 
+theorem reputation_aggregation_paper_claim
+    (R : ReputationAggregationAssumption) :
+    0 < R.reputationCost ∧
+      2 ≤ R.countRule.Kmax ∧
+      Monotone R.countRule.count ∧
+      R.countRule.count 0 ≤ 1 ∧
+      R.countRule.count 1 = R.countRule.Kmax ∧
+      (∀ nu, OperativeUnbundling R nu ↔ 2 ≤ R.countRule.count nu) := by
+  exact ⟨R.hReputationCostPositive,
+    R.countRule.hKmaxAtLeastTwo,
+    R.countRule.hMonotone,
+    R.countRule.hAtZero,
+    R.countRule.hAtOne,
+    fun _ => Iff.rfl⟩
+
 /-- A symmetric homogeneous-price equilibrium is represented by its observed
     common fee together with the two deviation inequalities used in the paper.
     Reputation maintenance is a per-certification marginal resource cost, not
@@ -234,6 +249,14 @@ def PositiveWelfareIncidence (W : WelfareAccessFunctional)
   tau * rentReduction B R C omega pi nu ≤
     W.Wcred omega pi nu - W.Wcred omega pi 0
 
+def CertificationRentWelfareIncidence (W : WelfareAccessFunctional)
+    (B : BundledCertificationAssumption)
+    (R : ReputationAggregationAssumption)
+    (C : CertifierCompetitionAssumption)
+    (omega pi nu tau : ℝ) : Prop :=
+  0 < tau ∧ tau ≤ 1 ∧
+    PositiveWelfareIncidence W B R C omega pi nu tau
+
 theorem cor_t4_welfare
     (credence : CredenceGoodAssumption)
     (R : ReputationAggregationAssumption)
@@ -259,6 +282,23 @@ theorem cor_t4_welfare
       mul_pos hTauPositive hRent
     unfold PositiveWelfareIncidence at hIncidence
     linarith
+
+theorem cor_t4_welfare_paper
+    (credence : CredenceGoodAssumption)
+    (R : ReputationAggregationAssumption)
+    (W : WelfareAccessFunctional)
+    (B : BundledCertificationAssumption)
+    (C : CertifierCompetitionAssumption)
+    (omega pi nu tau : ℝ)
+    (hOmegaLo : 0 ≤ omega) (hOmegaHi : omega ≤ 1)
+    (hPiLo : 0 ≤ pi) (hPiHi : pi ≤ 1)
+    (hOperative : OperativeUnbundling R nu)
+    (hIncidence : CertificationRentWelfareIncidence W B R C omega pi nu tau) :
+    tau * rentReduction B R C omega pi nu ≤
+        W.Wcred omega pi nu - W.Wcred omega pi 0 ∧
+      0 < W.Wcred omega pi nu - W.Wcred omega pi 0 := by
+  exact cor_t4_welfare credence R W B C omega pi nu tau
+    hOmegaLo hOmegaHi hPiLo hPiHi hOperative hIncidence.1 hIncidence.2.2
 
 /-! ## Proof-ledger endpoint claims -/
 
@@ -353,8 +393,8 @@ def WelfareCorollaryClaim : Prop :=
     (C : CertifierCompetitionAssumption)
     (omega pi nu tau : ℝ),
     0 ≤ omega → omega ≤ 1 → 0 ≤ pi → pi ≤ 1 →
-    OperativeUnbundling R nu → 0 < tau →
-    PositiveWelfareIncidence W B R C omega pi nu tau →
+    OperativeUnbundling R nu →
+    CertificationRentWelfareIncidence W B R C omega pi nu tau →
       tau * rentReduction B R C omega pi nu ≤
           W.Wcred omega pi nu - W.Wcred omega pi 0 ∧
         0 < W.Wcred omega pi nu - W.Wcred omega pi 0
@@ -367,11 +407,11 @@ theorem welfareCorollaryClaim_proved :
       (C : CertifierCompetitionAssumption)
       (omega pi nu tau : ℝ),
       0 ≤ omega → omega ≤ 1 → 0 ≤ pi → pi ≤ 1 →
-      OperativeUnbundling R nu → 0 < tau →
-      PositiveWelfareIncidence W B R C omega pi nu tau →
+      OperativeUnbundling R nu →
+      CertificationRentWelfareIncidence W B R C omega pi nu tau →
         tau * rentReduction B R C omega pi nu ≤
             W.Wcred omega pi nu - W.Wcred omega pi 0 ∧
           0 < W.Wcred omega pi nu - W.Wcred omega pi 0 :=
-  cor_t4_welfare
+  cor_t4_welfare_paper
 
 end AccessOrthogonality.CurrentPaper

@@ -347,6 +347,30 @@ theorem marginal_lobbying_chain_rule
   subst m
   exact hUtility.comp ell hPolicy
 
+/-- Display F20 with the paper's literal provider utility, ownership weight,
+    welfare derivative, policy derivative, and uniform-zero-profit premise. -/
+theorem marginal_lobbying_under_zero_profit {n : Nat}
+    (E : LongRunEnvironment n) (theta : OwnershipProfile n) (i : Fin n)
+    (policy : ℝ → ℝ) (ell m dWdm dmDell : ℝ)
+    (hProfit : UniformZeroProfit E)
+    (hWelfare : HasDerivAt (E.welfare theta) dWdm m)
+    (hPolicy : HasDerivAt policy dmDell ell)
+    (hValue : policy ell = m) :
+    HasDerivAt
+      (fun effort => providerUtility E theta i (policy effort))
+      ((theta i).val * dWdm * dmDell) ell := by
+  subst m
+  have hWeighted :
+      HasDerivAt
+        (fun policyValue => (theta i).val * E.welfare theta policyValue)
+        ((theta i).val * dWdm) (policy ell) := by
+    convert (hasDerivAt_const (x := policy ell) (theta i).val).mul hWelfare using 1 <;>
+      simp
+  have hComposed := hWeighted.comp ell hPolicy
+  convert hComposed using 1
+  · funext effort
+    simp [providerUtility, hProfit theta i (policy effort)]
+
 /-! ## Display F18: an actual one-provider two-stage bundled-game witness -/
 
 def bundledExampleWelfare (m : ℝ) : ℝ := 1 - m
@@ -436,6 +460,14 @@ def IsProviderBestResponse
       bundledProviderPayoff theta policy ell ≤
         bundledProviderPayoff theta policy ellStar
 
+def IsUniqueProviderBestResponse
+    (theta : ℝ) (policy : ℝ → ℝ) (ellStar : ℝ) : Prop :=
+  IsProviderBestResponse theta policy ellStar ∧
+    ∀ ell, 0 ≤ ell →
+      bundledProviderPayoff theta policy ell =
+          bundledProviderPayoff theta policy ellStar →
+        ell = ellStar
+
 theorem bundled_private_lobbying_best_response :
     IsProviderBestResponse 0 bundledPrivatePolicy (1 / 3 : ℝ) := by
   constructor
@@ -461,6 +493,30 @@ theorem bundled_public_lobbying_best_response :
       bundledExampleProviderUtility, bundledExampleProfit,
       bundledExampleWelfare]
     nlinarith [sq_nonneg ell]
+
+theorem bundled_private_lobbying_unique_best_response :
+    IsUniqueProviderBestResponse 0 bundledPrivatePolicy (1 / 3 : ℝ) := by
+  refine ⟨bundled_private_lobbying_best_response, ?_⟩
+  intro ell hEll hPayoff
+  by_cases hThreshold : (3 : ℝ)⁻¹ ≤ ell
+  · simp [bundledProviderPayoff, bundledPrivatePolicy, hThreshold,
+      bundledExampleProviderUtility, bundledExampleProfit,
+      bundledExampleWelfare] at hPayoff
+    nlinarith
+  · have hBelow : ell < (3 : ℝ)⁻¹ := lt_of_not_ge hThreshold
+    simp [bundledProviderPayoff, bundledPrivatePolicy, hThreshold,
+      bundledExampleProviderUtility, bundledExampleProfit,
+      bundledExampleWelfare] at hPayoff
+    nlinarith [sq_nonneg ell]
+
+theorem bundled_public_lobbying_unique_best_response :
+    IsUniqueProviderBestResponse 1 bundledPublicPolicy 0 := by
+  refine ⟨bundled_public_lobbying_best_response, ?_⟩
+  intro ell hEll hPayoff
+  simp [bundledProviderPayoff, bundledPublicPolicy,
+    bundledExampleProviderUtility, bundledExampleProfit,
+    bundledExampleWelfare] at hPayoff
+  nlinarith
 
 def bundledExampleAccess : AccessVector where
   omega := 0
@@ -650,6 +706,17 @@ def IsActualProviderBestResponse
       bundledActualProviderPayoff theta profile ell hEll ≤
         bundledActualProviderPayoff theta profile ellStar hStar
 
+def IsUniqueActualProviderBestResponse
+    (theta : ℝ) (profile : OwnershipProfile 1) (ellStar : ℝ) : Prop :=
+  ∃ hStar : 0 ≤ ellStar,
+    (∀ ell (hEll : 0 ≤ ell),
+      bundledActualProviderPayoff theta profile ell hEll ≤
+        bundledActualProviderPayoff theta profile ellStar hStar) ∧
+    (∀ ell (hEll : 0 ≤ ell),
+      bundledActualProviderPayoff theta profile ell hEll =
+          bundledActualProviderPayoff theta profile ellStar hStar →
+        ell = ellStar)
+
 theorem bundled_private_actual_lobbying_best_response :
     IsActualProviderBestResponse 0 bundledPrivateProfile (1 / 3 : ℝ) := by
   refine ⟨by norm_num, ?_⟩
@@ -668,9 +735,85 @@ theorem bundled_public_actual_lobbying_best_response :
     bundled_public_policy_matches_selectedPolicy 0 (by norm_num)]
   exact bundled_public_lobbying_best_response.2 ell hEll
 
+theorem bundled_private_actual_lobbying_unique_best_response :
+    IsUniqueActualProviderBestResponse 0 bundledPrivateProfile (1 / 3 : ℝ) := by
+  refine ⟨by norm_num, ?_, ?_⟩
+  · intro ell hEll
+    unfold bundledActualProviderPayoff
+    rw [bundled_private_policy_matches_selectedPolicy ell hEll,
+      bundled_private_policy_matches_selectedPolicy (1 / 3 : ℝ) (by norm_num)]
+    exact bundled_private_lobbying_unique_best_response.1.2 ell hEll
+  · intro ell hEll hPayoff
+    unfold bundledActualProviderPayoff at hPayoff
+    rw [bundled_private_policy_matches_selectedPolicy ell hEll,
+      bundled_private_policy_matches_selectedPolicy (1 / 3 : ℝ) (by norm_num)] at hPayoff
+    exact bundled_private_lobbying_unique_best_response.2 ell hEll hPayoff
+
+theorem bundled_public_actual_lobbying_unique_best_response :
+    IsUniqueActualProviderBestResponse 1 bundledPublicProfile 0 := by
+  refine ⟨by norm_num, ?_, ?_⟩
+  · intro ell hEll
+    unfold bundledActualProviderPayoff
+    rw [bundled_public_policy_matches_selectedPolicy ell hEll,
+      bundled_public_policy_matches_selectedPolicy 0 (by norm_num)]
+    exact bundled_public_lobbying_unique_best_response.1.2 ell hEll
+  · intro ell hEll hPayoff
+    unfold bundledActualProviderPayoff at hPayoff
+    rw [bundled_public_policy_matches_selectedPolicy ell hEll,
+      bundled_public_policy_matches_selectedPolicy 0 (by norm_num)] at hPayoff
+    exact bundled_public_lobbying_unique_best_response.2 ell hEll hPayoff
+
+theorem bundled_private_public_profiles_ne :
+    bundledPrivateProfile ≠ bundledPublicProfile := by
+  intro hProfiles
+  have hValues := congrArg (fun profile => (profile 0).val) hProfiles
+  norm_num [bundledPrivateProfile, bundledPublicProfile,
+    OwnershipType.privateEndpoint, OwnershipType.publicEndpoint] at hValues
+
+theorem bundled_equilibrium_ownership_dependence :
+    ∃ thetaOne thetaTwo : OwnershipProfile 1,
+      thetaOne ≠ thetaTwo ∧
+      selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+          thetaOne (bundledExampleLobbying (1 / 3 : ℝ) (by norm_num)) ≠
+        selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+          thetaTwo (bundledExampleLobbying 0 (by norm_num)) := by
+  refine ⟨bundledPrivateProfile, bundledPublicProfile,
+    bundled_private_public_profiles_ne, ?_⟩
+  rw [bundled_private_equilibrium_selected_policy,
+    bundled_public_equilibrium_selected_policy]
+  norm_num
+
+def BundledPathUniqueClaim : Prop :=
+  IsUniqueActualProviderBestResponse 0 bundledPrivateProfile (1 / 3 : ℝ) ∧
+    IsUniqueActualProviderBestResponse 1 bundledPublicProfile 0 ∧
+    (∀ ell (hEll : 0 ≤ ell),
+      selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+          bundledPrivateProfile (bundledExampleLobbying ell hEll) =
+        bundledPrivatePolicy ell) ∧
+    (∀ ell (hEll : 0 ≤ ell),
+      selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+          bundledPublicProfile (bundledExampleLobbying ell hEll) =
+        bundledPublicPolicy ell)
+
+theorem bundled_path_unique_witness :
+    IsUniqueActualProviderBestResponse 0 bundledPrivateProfile (1 / 3 : ℝ) ∧
+      IsUniqueActualProviderBestResponse 1 bundledPublicProfile 0 ∧
+      (∀ ell (hEll : 0 ≤ ell),
+        selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+            bundledPrivateProfile (bundledExampleLobbying ell hEll) =
+          bundledPrivatePolicy ell) ∧
+      (∀ ell (hEll : 0 ≤ ell),
+        selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+            bundledPublicProfile (bundledExampleLobbying ell hEll) =
+          bundledPublicPolicy ell) := by
+  exact ⟨bundled_private_actual_lobbying_unique_best_response,
+    bundled_public_actual_lobbying_unique_best_response,
+    bundled_private_policy_matches_selectedPolicy,
+    bundled_public_policy_matches_selectedPolicy⟩
+
 def BundledPolicyDependenceClaim : Prop :=
-    IsActualProviderBestResponse 0 bundledPrivateProfile (1 / 3 : ℝ) ∧
-      IsActualProviderBestResponse 1 bundledPublicProfile 0 ∧
+    IsUniqueActualProviderBestResponse 0 bundledPrivateProfile (1 / 3 : ℝ) ∧
+      IsUniqueActualProviderBestResponse 1 bundledPublicProfile 0 ∧
       (∀ ell (hEll : 0 ≤ ell),
         selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
             bundledPrivateProfile (bundledExampleLobbying ell hEll) =
@@ -689,11 +832,18 @@ def BundledPolicyDependenceClaim : Prop :=
           bundledPrivateProfile (bundledExampleLobbying (1 / 3 : ℝ) (by norm_num)) = 1 ∧
       selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
           bundledPublicProfile (bundledExampleLobbying 0 (by norm_num)) = 0 ∧
-      bundledPrivatePolicy (1 / 3 : ℝ) ≠ bundledPublicPolicy 0
+      bundledPrivatePolicy (1 / 3 : ℝ) ≠ bundledPublicPolicy 0 ∧
+      bundledPrivateProfile ≠ bundledPublicProfile ∧
+      (∃ thetaOne thetaTwo : OwnershipProfile 1,
+        thetaOne ≠ thetaTwo ∧
+        selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+            thetaOne (bundledExampleLobbying (1 / 3 : ℝ) (by norm_num)) ≠
+          selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+            thetaTwo (bundledExampleLobbying 0 (by norm_num)))
 
 theorem bundled_policy_dependence_witness :
-    IsActualProviderBestResponse 0 bundledPrivateProfile (1 / 3 : ℝ) ∧
-      IsActualProviderBestResponse 1 bundledPublicProfile 0 ∧
+    IsUniqueActualProviderBestResponse 0 bundledPrivateProfile (1 / 3 : ℝ) ∧
+      IsUniqueActualProviderBestResponse 1 bundledPublicProfile 0 ∧
       (∀ ell (hEll : 0 ≤ ell),
         selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
             bundledPrivateProfile (bundledExampleLobbying ell hEll) =
@@ -712,13 +862,22 @@ theorem bundled_policy_dependence_witness :
           bundledPrivateProfile (bundledExampleLobbying (1 / 3 : ℝ) (by norm_num)) = 1 ∧
       selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
           bundledPublicProfile (bundledExampleLobbying 0 (by norm_num)) = 0 ∧
-      bundledPrivatePolicy (1 / 3 : ℝ) ≠ bundledPublicPolicy 0 := by
-  refine ⟨bundled_private_actual_lobbying_best_response,
-    bundled_public_actual_lobbying_best_response,
+      bundledPrivatePolicy (1 / 3 : ℝ) ≠ bundledPublicPolicy 0 ∧
+      bundledPrivateProfile ≠ bundledPublicProfile ∧
+      (∃ thetaOne thetaTwo : OwnershipProfile 1,
+        thetaOne ≠ thetaTwo ∧
+        selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+            thetaOne (bundledExampleLobbying (1 / 3 : ℝ) (by norm_num)) ≠
+          selectedPolicy bundledExampleEnvironment bundledExampleTieBreak
+            thetaTwo (bundledExampleLobbying 0 (by norm_num))) := by
+  refine ⟨bundled_private_actual_lobbying_unique_best_response,
+    bundled_public_actual_lobbying_unique_best_response,
     bundled_private_policy_matches_selectedPolicy,
     bundled_public_policy_matches_selectedPolicy, ?_, ?_, ?_, ?_,
     bundled_private_equilibrium_selected_policy,
-    bundled_public_equilibrium_selected_policy, ?_⟩
+    bundled_public_equilibrium_selected_policy, ?_,
+    bundled_private_public_profiles_ne,
+    bundled_equilibrium_ownership_dependence⟩
   · exact bundled_private_policy_is_regulator_best (1 / 3 : ℝ)
   · exact bundled_public_policy_is_regulator_best 0 (by norm_num)
   · simp [bundledPrivatePolicy]

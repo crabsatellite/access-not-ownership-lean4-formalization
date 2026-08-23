@@ -58,7 +58,8 @@ def entryRegime : Entry :=
 
 def entryOwnershipInvariant : Entry :=
   ⟨4, .definition, "def:owninv", "Ownership-invariant mechanism",
-    "GloballyOwnershipInvariant; LocallyOwnershipInvariant", .definitional⟩
+    "paper_global_ownership_invariance_exact; paper_local_ownership_invariance_exact",
+    .definitional⟩
 
 def entryLocalIdentification : Entry :=
   ⟨5, .assumption, "ass:local_identification", "Local welfare identification",
@@ -85,8 +86,8 @@ def entryTaxonomyScope : Entry :=
 
 def entrySeparation : Entry :=
   ⟨10, .corollary, "thm:separation", "Constructive separation",
-    "fullSeparationClaim_proved",
-    .proved FullSeparationClaim fullSeparationClaim_proved⟩
+    "separationFromSC3Claim_proved",
+    .proved SeparationFromSC3Claim (by exact separationFromSC3Claim_proved)⟩
 
 def entryConstructiveStrength : Entry :=
   ⟨11, .remark, "rem:constructive-strength", "Why constructive is stronger",
@@ -151,8 +152,8 @@ def entryWelfareCorollary : Entry :=
 
 def entryBundledDependence : Entry :=
   ⟨25, .proposition, "prop:bundled_dependence", "Bundled equilibrium dependence",
-    "bundled_policy_dependence_witness",
-    .proved BundledPolicyDependenceClaim bundled_policy_dependence_witness⟩
+    "bundled_path_unique_witness",
+    .proved BundledPathUniqueClaim bundled_path_unique_witness⟩
 
 def entryLongRun : Entry :=
   ⟨26, .theorem, "thm:longrun", "Long-run orthogonality",

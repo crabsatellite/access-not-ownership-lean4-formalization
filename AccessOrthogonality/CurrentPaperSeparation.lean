@@ -5,6 +5,35 @@ import Mathlib.Analysis.Calculus.Deriv.Basic
 
 namespace AccessOrthogonality.CurrentPaper
 
+theorem thm_separation_from_sc3
+    (br : BestResponseMap) (R : Regime) (wD : ℝ)
+    (hSC3 : SC3FrontierFinancing br R wD) :
+    GloballyOwnershipInvariant br R :=
+  prop_four_mechanisms_Mbeta br R wD hSC3
+
+theorem thm_separation_from_sc3_welfare_invariant
+    (W : WelfareFunctional) (br : BestResponseMap)
+    (R : Regime) (a : AccessVector) (wD : ℝ)
+    (hSC3 : SC3FrontierFinancing br R wD) :
+    WelfareThetaInvariant W br a R :=
+  global_ownership_invariance_implies_welfare_invariance W br a R
+    (thm_separation_from_sc3 br R wD hSC3)
+
+def SeparationFromSC3Claim : Prop :=
+  ∀ W br R a wD,
+    SC3FrontierFinancing br R wD →
+      GloballyOwnershipInvariant br R ∧
+        WelfareThetaInvariant W br a R
+
+theorem separationFromSC3Claim_proved :
+    ∀ W br R a wD,
+      SC3FrontierFinancing br R wD →
+        GloballyOwnershipInvariant br R ∧
+          WelfareThetaInvariant W br a R := by
+  intro W br R a wD hSC3
+  exact ⟨thm_separation_from_sc3 br R wD hSC3,
+    thm_separation_from_sc3_welfare_invariant W br R a wD hSC3⟩
+
 theorem thm_separation
     (inst : InstitutionalPredicates) (br : BestResponseMap)
     (R : Regime) (a : AccessVector) (wD : ℝ)

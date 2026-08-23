@@ -7,6 +7,7 @@ open AccessOrthogonality.CurrentPaper
 /-! ## Definition 1 -/
 #check AccessStructure
 #check AccessVector
+#check paper_access_structure_definition_exact
 
 /-! ## Definition 2 -/
 #check WelfareComponents
@@ -14,10 +15,12 @@ open AccessOrthogonality.CurrentPaper
 
 /-! ## Definition 3 -/
 #check Regime
+#check Regime.mk
 
 /-! ## Definition 4 -/
 #check GloballyOwnershipInvariant
 #check LocallyOwnershipInvariant
+#check paper_global_ownership_invariance_exact
 
 /-! ## Assumption 5 -/
 #check FunctionalLocalIdentification
@@ -45,6 +48,7 @@ open AccessOrthogonality.CurrentPaper
 #check thm_separation_welfare_invariant
 #check thm_separation_derivative_zero
 #check fullSeparationClaim_proved
+#check separationFromSC3Claim_proved
 
 /-! ## Remark 11 -/
 #check global_constant_allocation_has_zero_derivatives
@@ -54,6 +58,7 @@ open AccessOrthogonality.CurrentPaper
 
 /-! ## Assumption 13 -/
 #check ReputationAggregationAssumption
+#check reputation_aggregation_paper_claim
 
 /-! ## Lemma 14 -/
 #check consumerInformation
@@ -89,6 +94,8 @@ open AccessOrthogonality.CurrentPaper
 
 /-! ## Assumption 22 -/
 #check PositiveWelfareIncidence
+#check CertificationRentWelfareIncidence
+#check paper_positive_welfare_incidence_exact
 
 /-! ## Theorem 23 -/
 #check rentReduction
@@ -98,14 +105,22 @@ open AccessOrthogonality.CurrentPaper
 
 /-! ## Corollary 24 -/
 #check cor_t4_welfare
+#check cor_t4_welfare_paper
 #check welfareCorollaryClaim_proved
 
 /-! ## Proposition 25 -/
 #check BundledPolicyDependenceClaim
 #check bundled_policy_dependence_witness
+#check BundledPathUniqueClaim
+#check bundled_path_unique_witness
 #check IsActualProviderBestResponse
+#check IsUniqueActualProviderBestResponse
 #check bundled_private_actual_lobbying_best_response
 #check bundled_public_actual_lobbying_best_response
+#check bundled_private_actual_lobbying_unique_best_response
+#check bundled_public_actual_lobbying_unique_best_response
+#check bundled_private_public_profiles_ne
+#check bundled_equilibrium_ownership_dependence
 #check bundled_private_policy_matches_selectedPolicy
 #check bundled_public_policy_matches_selectedPolicy
 #check bundledExampleObjective_matches_regulator
@@ -125,6 +140,7 @@ open AccessOrthogonality.CurrentPaper
 #check zeroLobbying_unique_nash
 #check profit_derivative_zero
 #check marginal_lobbying_chain_rule
+#check marginal_lobbying_under_zero_profit
 #check LobbyingFirstOrderCondition
 #check lobbying_foc_of_stationary
 #check bundled_private_lobbying_best_response
@@ -140,24 +156,20 @@ open AccessOrthogonality.CurrentPaper
 #check paper_access_vector_exact
 #check paper_quality_growth_exact
 #check paper_provider_objective_exact
-#check LocallyOwnershipInvariant
+#check paper_local_ownership_invariance_exact
 #check paper_reduced_welfare_exact
-#check thm_characterization
+#check paper_characterization_formula_exact
 #check paper_equilibrium_reduced_welfare_exact
-#check WelfareChainRule
-#check welfare_orthogonal_iff_quality_invariant
-#check OnCostMinimizingBranch
-#check quality_invariant_iff_inputs_invariant
+#check paper_welfare_chain_rule_exact
+#check paper_cost_minimizing_branch_exact
 #check thm_separation_derivative_zero
-#check consumerInformation
+#check paper_consumer_information_exact
 #check lem_independence
 #check paper_rent_reduction_exact
 #check cor_t4_welfare
 #check paper_regulator_objective_exact
 #check lobbying_foc_of_stationary
 #check selectedPolicy_definition
-#check bundled_policy_dependence_witness
+#check bundled_equilibrium_ownership_dependence
 #check profit_derivative_zero
-#check marginal_lobbying_chain_rule
-#check positive_effort_has_profitable_zero_deviation
-#check zeroLobbying_unique_nash
+#check marginal_lobbying_under_zero_profit

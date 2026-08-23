@@ -8,6 +8,8 @@ not the historical extended-paper theorem inventory.
 - 26/26 numbered formal objects are present in the proof-carrying ledger.
 - 20/20 displayed formulas have adjacent TeX-to-Lean bindings.
 - 11 derived mathematical entries are kernel proved.
+- Paper Infrastructure schema 2 binds 52 atomic manuscript claims: 46 formal
+  roots and 6 explicit scope boundaries.
 - Definitions and maintained assumptions are typed at their manuscript role.
 - The current-paper namespace has no `axiom`, `opaque`, `sorry`, `admit`, or
   `native_decide` declaration.
@@ -23,10 +25,10 @@ count toward current-paper coverage.
 |---|---|
 | `CurrentPaperBasic.lean` | actor-layer-date access, welfare accounting, exact `R=(P_a,F,S,X)`, ownership invariance, objective, SC1--SC6 |
 | `CurrentPaperCharacterization.lean` | chain rule, inverse-branch derivative identity, Theorem 6, flat-welfare counterexample |
-| `CurrentPaperMechanisms.lean` | qualified M-alpha and proved M-beta/M-gamma/M-delta implementation families |
-| `CurrentPaperSeparation.lean` | Corollary 10 and zero ownership derivative under the selected allocation |
+| `CurrentPaperMechanisms.lean` | non-circular rent-zero/welfare-consistent M-alpha and proved M-beta/M-gamma/M-delta families |
+| `CurrentPaperSeparation.lean` | SC3-only Corollary 10 and zero ownership derivative under the selected allocation |
 | `CurrentPaperVerification.lean` | positive residual-gap premise, integer evaluator threshold, no-loss/no-undercut Bertrand producer, cost-based fee, bundled markup, verification theorem and welfare corollary |
-| `CurrentPaperLongRun.lean` | ownership-indexed capture objective, nonempty argmax selection, genuine two-stage bundled equilibrium witness, unilateral-deviation Nash proof, and long-run theorem |
+| `CurrentPaperLongRun.lean` | ownership-indexed capture objective, unique actual bundled best responses, distinct-profile equilibrium witness, literal F20 chain, unilateral-deviation Nash proof, and long-run theorem |
 | `CurrentPaperExactness.lean` | literal consumers for all twenty displayed formulas |
 | `CurrentPaperLedger.lean` | 26-object proof-carrying publication ledger |
 | `CurrentPaperTheoremMap.lean` | numbered paper-to-kernel map |

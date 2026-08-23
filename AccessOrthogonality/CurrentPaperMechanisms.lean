@@ -22,9 +22,20 @@ def MechanismMalpha (P : ProfitFunctional) (R : Regime)
     (feasible : Investment → Prop) : Prop :=
   ∃ k : ℝ, ∀ x, feasible x → P.Pi x R = k
 
-/-- The common selection qualification required at the private endpoint. -/
-def CommonSelection (br : BestResponseMap) (R : Regime) : Prop :=
-  ∃ xStar, ∀ theta, br.alloc theta R = xStar
+/-- The non-circular selection qualification required by the rent-zero
+    mechanism.  Welfare has a strict unique maximizer, every recorded
+    allocation is a best response to the mixed objective, and the private
+    endpoint selects that welfare maximizer.  Unlike global ownership
+    invariance, this condition does not assume that every type selects the
+    same allocation. -/
+def CommonSelection (P : ProfitFunctional) (W : WelfareFunctional)
+    (br : BestResponseMap) (a : AccessVector) (R : Regime)
+    (feasible : Investment → Prop) : Prop :=
+  ∃ xStar,
+    IsStrictUniqueMaxOn (fun x => W.W x a R) feasible xStar ∧
+    br.alloc OwnershipType.privateEndpoint R = xStar ∧
+    ∀ theta,
+      IsMaxOn (providerObjective P W a R theta) feasible (br.alloc theta R)
 
 /-- M_beta is exactly the unique IC-financing content of SC3. -/
 def MechanismMbeta (br : BestResponseMap) (R : Regime) (wD : ℝ) : Prop :=
@@ -49,12 +60,41 @@ def MechanismMdelta (br : BestResponseMap) (R : Regime) : Prop :=
     (∀ theta, R.externalConstraints (br.alloc theta R))
 
 theorem prop_four_mechanisms_Malpha_with_selection
-    (P : ProfitFunctional) (br : BestResponseMap) (R : Regime)
+    (P : ProfitFunctional) (W : WelfareFunctional)
+    (br : BestResponseMap) (a : AccessVector) (R : Regime)
     (feasible : Investment → Prop)
-    (_hMalpha : MechanismMalpha P R feasible)
-    (hSelection : CommonSelection br R) :
-    GloballyOwnershipInvariant br R :=
-  hSelection
+    (hMalpha : MechanismMalpha P R feasible)
+    (hSelection : CommonSelection P W br a R feasible) :
+    GloballyOwnershipInvariant br R := by
+  obtain ⟨profitConstant, hProfitConstant⟩ := hMalpha
+  obtain ⟨xStar, hWelfareUnique, hPrivateSelection, hBest⟩ := hSelection
+  refine ⟨xStar, ?_⟩
+  intro theta
+  by_cases hThetaZero : theta.val = 0
+  · have hThetaPrivate : theta = OwnershipType.privateEndpoint := by
+      cases theta with
+      | mk val hLo hHi =>
+          simp only at hThetaZero
+          subst val
+          rfl
+    simpa [hThetaPrivate] using hPrivateSelection
+  · have hThetaPositive : 0 < theta.val :=
+      lt_of_le_of_ne theta.hLo (Ne.symm hThetaZero)
+    by_contra hDifferent
+    have hChosenFeasible := (hBest theta).1
+    have hStarFeasible := hWelfareUnique.1
+    have hWelfareStrict :=
+      hWelfareUnique.2 (br.alloc theta R) hChosenFeasible hDifferent
+    have hProfitChosen := hProfitConstant (br.alloc theta R) hChosenFeasible
+    have hProfitStar := hProfitConstant xStar hStarFeasible
+    have hStrictObjective :
+        providerObjective P W a R theta (br.alloc theta R) <
+          providerObjective P W a R theta xStar := by
+      unfold providerObjective
+      rw [hProfitChosen, hProfitStar]
+      nlinarith
+    have hReverse := (hBest theta).2 xStar hStarFeasible
+    linarith
 
 theorem prop_four_mechanisms_Mbeta
     (br : BestResponseMap) (R : Regime) (wD : ℝ)
@@ -117,8 +157,8 @@ theorem prop_four_mechanisms_Mdelta
 
 /-- The complete mathematical content of Proposition 8. -/
 def MechanismFamiliesClaim : Prop :=
-  (∀ P br R feasible,
-      MechanismMalpha P R feasible → CommonSelection br R →
+  (∀ P W br a R feasible,
+      MechanismMalpha P R feasible → CommonSelection P W br a R feasible →
         GloballyOwnershipInvariant br R) ∧
   (∀ br R wD,
       MechanismMbeta br R wD → GloballyOwnershipInvariant br R) ∧
@@ -129,8 +169,8 @@ def MechanismFamiliesClaim : Prop :=
       MechanismMdelta br R → GloballyOwnershipInvariant br R)
 
 theorem mechanismFamiliesClaim_proved :
-    (∀ P br R feasible,
-      MechanismMalpha P R feasible → CommonSelection br R →
+    (∀ P W br a R feasible,
+      MechanismMalpha P R feasible → CommonSelection P W br a R feasible →
         GloballyOwnershipInvariant br R) ∧
     (∀ br R wD,
       MechanismMbeta br R wD → GloballyOwnershipInvariant br R) ∧
